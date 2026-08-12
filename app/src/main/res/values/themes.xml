@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="Theme.HuimeiVoice" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/huimei_primary</item>
+        <item name="colorPrimaryDark">@color/huimei_primary_dark</item>
+        <item name="colorAccent">@color/huimei_accent</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:navigationBarColor">@color/surface_muted</item>
+    </style>
+</resources>
