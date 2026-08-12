@@ -13,6 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.huimei.voice.audio.VoicePromptCatalog;
+import com.huimei.voice.audio.VoicePromptPlayer;
+import com.huimei.voice.model.CommandEvent;
 import com.huimei.voice.model.RecognitionAction;
 import com.huimei.voice.model.VoiceLanguage;
 import com.huimei.voice.recognition.CommandCatalog;
@@ -27,6 +30,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
     private final EventLogFormatter logFormatter = new EventLogFormatter();
     private VoiceRecognitionController controller;
+    private VoicePromptPlayer promptPlayer;
     private VoiceLanguage selectedLanguage = VoiceLanguage.CHINESE;
     private TextView modelText;
     private TextView wakePhraseText;
@@ -44,6 +48,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
         bindViews();
         controller = new VoiceRecognitionController(this, this);
+        promptPlayer = new VoicePromptPlayer(this);
         updateLanguageMetadata();
         onStatus("等待麦克风权限");
 
@@ -78,6 +83,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
     }
 
     private void selectLanguage(int checkedId) {
+        promptPlayer.stop();
         selectedLanguage = checkedId == R.id.language_english
                 ? VoiceLanguage.ENGLISH
                 : VoiceLanguage.CHINESE;
@@ -98,6 +104,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
     private void toggleListening() {
         if (controller.isRunning()) {
+            promptPlayer.stop();
             controller.stop();
             return;
         }
@@ -157,11 +164,33 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
     @Override
     public void onWakeUp(VoiceLanguage language, RecognitionAction action) {
         appendLog(logFormatter.eventLine(language, "唤醒", action));
+        playPrompt(language, action.getMatch().getEvent());
     }
 
     @Override
     public void onCommand(VoiceLanguage language, RecognitionAction action) {
         appendLog(logFormatter.eventLine(language, "命令", action));
+        playPrompt(language, action.getMatch().getEvent());
+    }
+
+    private void playPrompt(VoiceLanguage language, CommandEvent event) {
+        int resourceId = VoicePromptCatalog.rawResourceFor(language, event);
+        if (resourceId == 0 || !controller.pauseForPrompt()) {
+            return;
+        }
+        onDiagnostic("正在播放" + language.getDisplayName() + "提示音：" + event.name());
+        promptPlayer.play(resourceId, new VoicePromptPlayer.Listener() {
+            @Override
+            public void onCompleted() {
+                controller.resumeAfterPrompt();
+            }
+
+            @Override
+            public void onError(String message) {
+                onDiagnostic("提示音播放失败：" + message);
+                controller.resumeAfterPrompt();
+            }
+        });
     }
 
     private void appendLog(String line) {
@@ -176,6 +205,9 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
     @Override
     protected void onDestroy() {
+        if (promptPlayer != null) {
+            promptPlayer.close();
+        }
         if (controller != null) {
             controller.close();
         }
