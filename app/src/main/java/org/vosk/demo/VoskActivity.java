@@ -14,6 +14,8 @@
 
 package org.vosk.demo;
 
+import com.huimei.voice.R;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
