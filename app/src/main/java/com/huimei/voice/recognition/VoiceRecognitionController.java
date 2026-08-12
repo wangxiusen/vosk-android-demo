@@ -37,12 +37,13 @@ public final class VoiceRecognitionController implements AutoCloseable {
     private SpeechService speechService;
     private long generation;
     private boolean desiredRunning;
+    private boolean promptPlaybackPaused;
     private boolean closed;
 
     private final Runnable countdownTask = new Runnable() {
         @Override
         public void run() {
-            if (closed || !desiredRunning) {
+            if (closed || !desiredRunning || promptPlaybackPaused) {
                 return;
             }
             RecognitionAction action = stateMachine.pollTimeout();
@@ -165,7 +166,7 @@ public final class VoiceRecognitionController implements AutoCloseable {
     }
 
     private void processResult(long requestGeneration, VoiceLanguage requestedLanguage, String json) {
-        if (!isCurrent(requestGeneration, requestedLanguage)) {
+        if (!isCurrent(requestGeneration, requestedLanguage) || promptPlaybackPaused) {
             return;
         }
         Optional<String> text = RecognitionResultParser.parseText(json);
@@ -177,15 +178,19 @@ public final class VoiceRecognitionController implements AutoCloseable {
             case WOKE_UP:
                 listener.onStatus("已唤醒，请说命令");
                 listener.onWakeUp(language, action);
-                listener.onWakeWindowChanged(true, stateMachine.remainingMillis());
                 mainHandler.removeCallbacks(countdownTask);
-                mainHandler.postDelayed(countdownTask, COUNTDOWN_INTERVAL_MILLIS);
+                if (!promptPlaybackPaused) {
+                    listener.onWakeWindowChanged(true, stateMachine.remainingMillis());
+                    mainHandler.postDelayed(countdownTask, COUNTDOWN_INTERVAL_MILLIS);
+                }
                 break;
             case COMMAND:
                 mainHandler.removeCallbacks(countdownTask);
                 listener.onCommand(language, action);
                 listener.onWakeWindowChanged(false, 0L);
-                listener.onStatus("休眠监听中");
+                if (!promptPlaybackPaused) {
+                    listener.onStatus("休眠监听中");
+                }
                 break;
             case TIMED_OUT:
                 mainHandler.removeCallbacks(countdownTask);
@@ -196,6 +201,36 @@ public final class VoiceRecognitionController implements AutoCloseable {
             case NONE:
             default:
                 break;
+        }
+    }
+
+    public boolean pauseForPrompt() {
+        if (closed || !desiredRunning || speechService == null || promptPlaybackPaused) {
+            return false;
+        }
+        promptPlaybackPaused = true;
+        mainHandler.removeCallbacks(countdownTask);
+        speechService.setPause(true);
+        listener.onStatus("正在播放提示音");
+        return true;
+    }
+
+    public void resumeAfterPrompt() {
+        if (!promptPlaybackPaused) {
+            return;
+        }
+        promptPlaybackPaused = false;
+        if (closed || !desiredRunning || speechService == null) {
+            return;
+        }
+        speechService.setPause(false);
+        if (stateMachine.restartWakeWindow()) {
+            listener.onStatus("已唤醒，请说命令");
+            listener.onWakeWindowChanged(true, stateMachine.remainingMillis());
+            mainHandler.postDelayed(countdownTask, COUNTDOWN_INTERVAL_MILLIS);
+        } else {
+            listener.onWakeWindowChanged(false, 0L);
+            listener.onStatus("休眠监听中");
         }
     }
 
@@ -222,6 +257,7 @@ public final class VoiceRecognitionController implements AutoCloseable {
 
     private void releaseRecognitionResources() {
         mainHandler.removeCallbacks(countdownTask);
+        promptPlaybackPaused = false;
         if (speechService != null) {
             speechService.stop();
             speechService.shutdown();

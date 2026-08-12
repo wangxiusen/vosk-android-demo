@@ -1,6 +1,8 @@
 package com.huimei.voice.recognition;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import com.huimei.voice.model.CommandEvent;
 import com.huimei.voice.model.ListeningState;
@@ -94,6 +96,23 @@ public class WakeCommandStateMachineTest {
 
         assertEquals(RecognitionAction.Type.WOKE_UP, action.getType());
         assertEquals(8_000L, machine.remainingMillis());
+    }
+
+    @Test
+    public void restartingAwakeWindowRestoresFullEightSeconds() {
+        machine.accept("潓美医疗");
+        clock.advance(3_000L);
+
+        assertTrue(machine.restartWakeWindow());
+        assertEquals(ListeningState.AWAKE, machine.state());
+        assertEquals(8_000L, machine.remainingMillis());
+    }
+
+    @Test
+    public void restartingSleepingWindowDoesNotWakeRecognizer() {
+        assertFalse(machine.restartWakeWindow());
+        assertEquals(ListeningState.SLEEPING, machine.state());
+        assertEquals(0L, machine.remainingMillis());
     }
 
     @Test

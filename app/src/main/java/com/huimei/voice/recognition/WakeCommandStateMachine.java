@@ -70,6 +70,14 @@ public final class WakeCommandStateMachine {
         return Math.max(0L, deadlineMillis - timeSource.nowMillis());
     }
 
+    public boolean restartWakeWindow() {
+        if (state != ListeningState.AWAKE) {
+            return false;
+        }
+        deadlineMillis = timeSource.nowMillis() + WAKE_WINDOW_MILLIS;
+        return true;
+    }
+
     public ListeningState state() {
         return state;
     }
