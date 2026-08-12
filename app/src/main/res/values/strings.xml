@@ -6,9 +6,13 @@
     <string name="language_chinese">中文</string>
     <string name="language_english">English</string>
     <string name="model_label">当前模型</string>
+    <string name="model_value">当前模型：%1$s</string>
     <string name="wake_phrase_label">当前唤醒词</string>
+    <string name="wake_phrase_value">当前唤醒词：%1$s</string>
     <string name="status_label">状态</string>
+    <string name="status_value">状态：%1$s</string>
     <string name="countdown_label">唤醒剩余时间</string>
+    <string name="countdown_value">唤醒剩余时间：%1$s</string>
     <string name="countdown_sleeping">—</string>
     <string name="start_listening">开始监听</string>
     <string name="stop_listening">停止监听</string>

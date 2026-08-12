@@ -89,9 +89,11 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
     private void updateLanguageMetadata() {
         CommandCatalog catalog = CommandCatalog.forLanguage(selectedLanguage);
-        modelText.setText(getString(R.string.model_label) + "：" + catalog.assetModelPath());
-        wakePhraseText.setText(getString(R.string.wake_phrase_label) + "：" + catalog.wakePhrase());
-        countdownText.setText(getString(R.string.countdown_label) + "：" + getString(R.string.countdown_sleeping));
+        modelText.setText(getString(R.string.model_value, catalog.assetModelPath()));
+        wakePhraseText.setText(getString(R.string.wake_phrase_value, catalog.wakePhrase()));
+        countdownText.setText(getString(
+                R.string.countdown_value,
+                getString(R.string.countdown_sleeping)));
     }
 
     private void toggleListening() {
@@ -131,7 +133,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
 
     @Override
     public void onStatus(String status) {
-        statusText.setText(getString(R.string.status_label) + "：" + status);
+        statusText.setText(getString(R.string.status_value, status));
         if (controller != null) {
             listenButton.setText(controller.isRunning()
                     ? R.string.stop_listening
@@ -149,7 +151,7 @@ public final class MainActivity extends AppCompatActivity implements VoiceRecogn
         String value = awake
                 ? String.format(Locale.ROOT, "%.1f 秒", remainingMillis / 1000.0)
                 : getString(R.string.countdown_sleeping);
-        countdownText.setText(getString(R.string.countdown_label) + "：" + value);
+        countdownText.setText(getString(R.string.countdown_value, value));
     }
 
     @Override
