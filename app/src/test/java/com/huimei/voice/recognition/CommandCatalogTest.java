@@ -80,7 +80,9 @@ public class CommandCatalogTest {
         assertEquals("model-cn", chinese.assetModelPath());
         assertEquals("Hello Medical", english.wakePhrase());
         assertEquals("model-en-us", english.assetModelPath());
-        assertTrue(chinese.grammarJson().contains("\"半小时产气\""));
+        assertTrue(chinese.grammarJson().contains("\"惠美 医疗\""));
+        assertTrue(chinese.grammarJson().contains("\"半小时 产 气\""));
+        assertFalse(chinese.grammarJson().contains("\"潓美医疗\""));
         assertTrue(chinese.grammarJson().contains("\"[unk]\""));
         assertTrue(english.grammarJson().contains("\"hello medical\""));
     }
