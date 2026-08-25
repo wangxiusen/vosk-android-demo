@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/demo_lottie_title"
+        android:textColor="@color/text_primary"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="@string/lottie_demo_hint"
+        android:textColor="@color/text_secondary"
+        android:textSize="14sp" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/medical_assistant_animation"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        android:layout_weight="1"
+        android:background="@color/surface_card"
+        android:contentDescription="@string/lottie_content_description"
+        app:lottie_autoPlay="false"
+        app:lottie_fileName="medical-assistant-talking-v5.json"
+        app:lottie_loop="true" />
+
+    <TextView
+        android:id="@+id/animation_status"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:text="@string/lottie_status_loading"
+        android:textColor="@color/huimei_primary_dark"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/play_animation_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/play_animation" />
+
+        <Button
+            android:id="@+id/pause_animation_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/pause_animation" />
+
+        <Button
+            android:id="@+id/replay_animation_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:minHeight="48dp"
+            android:text="@string/replay_animation" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -7,4 +7,6 @@
     <color name="surface_muted">#F8FAFC</color>
     <color name="text_primary">#0F172A</color>
     <color name="text_secondary">#475569</color>
+    <color name="surface_card">#FFFFFF</color>
+    <color name="list_divider">#CBD5E1</color>
 </resources>

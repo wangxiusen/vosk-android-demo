@@ -1,6 +1,6 @@
 # 潓美医疗 Vosk 离线语音 Demo
 
-这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。应用完全离线运行，支持中英文模型切换，并且只有在唤醒后 8 秒内才响应固定命令。
+这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5，以及语音与动画联动三个 Demo，均完全离线运行。
 
 ## 功能
 
@@ -11,6 +11,8 @@
 - 中英文切换会释放旧模型、加载新模型并恢复监听。
 - UI 展示模型状态、唤醒倒计时、原始识别文字、标准词条和事件名。
 - 使用 Android 原生 `MediaPlayer` 离线播放中英文唤醒、1 小时产气和 8 小时产气提示音。
+- 使用 Lottie Android 离线加载医疗助手 V5，支持循环播放、暂停和重播。
+- 语音与动画联动页在待命时固定人物和闭口口型，仅保留眼睛动画；播放提示音时恢复口型，播放结束后自动回到待命。
 
 ## 命令
 
@@ -51,7 +53,7 @@ Debug APK 输出到：
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-首次运行需要授予麦克风权限。默认加载中文模型并自动开始监听。
+启动后先选择 Demo。进入语音识别 Demo 时需要授予麦克风权限，默认加载中文模型并自动开始监听。
 
 ## 代码结构
 
@@ -59,7 +61,11 @@ app/build/outputs/apk/debug/app-debug.apk
 - `RecognitionResultParser`：解析 Vosk final/result JSON。
 - `WakeCommandStateMachine`：休眠、唤醒和 8 秒超时逻辑。
 - `VoiceRecognitionController`：模型解压、Vosk 识别器、麦克风和语言切换生命周期。
-- `MainActivity`：权限、语言按钮、状态和日志 UI。
+- `MainActivity`：Demo 列表和页面跳转。
+- `VoiceRecognitionActivity`：权限、语言按钮、状态和日志 UI。
+- `LottieDemoActivity`：从 `app/src/main/assets/medical-assistant-talking-v5.json` 加载并控制医疗助手动画。
+- `VoiceAvatarActivity`：组合语音识别、提示音和医疗助手动画。
+- `LottieAvatarMotionController`：在待命和口播状态间切换口型及人物位移动画。
 
 ## 中文模型词表说明
 

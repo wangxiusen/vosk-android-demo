@@ -1,6 +1,6 @@
 # 潓美医疗离线语音 Demo：功能与工程知识记录
 
-> 更新日期：2026-08-24
+> 更新日期：2026-08-25
 >
 > 当前分支：`feat/huimei-voice-demo`
 >
@@ -20,6 +20,7 @@
 - 中文模型：`vosk-model-small-cn-0.22`。
 - 英文模型：`vosk-model-small-en-us-0.15`。
 - Android 原生 `MediaPlayer` 播放离线 MP3，不依赖 TTS SDK。
+- Lottie Android 6.7.1 播放离线医疗助手 V5 JSON。
 - 当前模型、Vosk、JNA及工程代码所使用的许可证信息见 `THIRD_PARTY_NOTICES.md`。
 
 工程模块：
@@ -81,6 +82,14 @@ docs/      已确认的设计文档和实施计划
 
 页面还支持开始/停止监听及清空日志。
 
+应用启动页现在是 Demo 列表：
+
+- “离线语音识别 Demo”进入原有语音页面。
+- “医疗助手 Lottie V5 Demo”从应用 Assets 离线加载动画，支持循环播放、暂停和重播。
+- “语音 + 医疗助手动画 Demo”复用原有中英文识别和提示音逻辑。待命时人物居中、闭口并仅保留眼睛活动；提示音播放期间恢复 V5 口型，结束或失败后自动恢复待命。
+
+V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包含口型、眨眼和视线动画所需的内嵌图片，不依赖网络资源。
+
 ### 2.5 离线提示音
 
 以下六个 MP3 已打包到 `app/src/main/res/raw/`：
@@ -110,7 +119,12 @@ docs/      已确认的设计文档和实施计划
 
 | 文件 | 职责 |
 |---|---|
-| `app/src/main/java/com/huimei/voice/MainActivity.java` | 权限、语言按钮、UI状态、日志、提示音触发 |
+| `app/src/main/java/com/huimei/voice/MainActivity.java` | Demo 列表和页面跳转 |
+| `app/src/main/java/com/huimei/voice/VoiceRecognitionActivity.java` | 权限、语言按钮、UI状态、日志、提示音触发 |
+| `app/src/main/java/com/huimei/voice/LottieDemoActivity.java` | V5 动画加载、播放、暂停、重播和生命周期管理 |
+| `app/src/main/java/com/huimei/voice/VoiceAvatarActivity.java` | 中英文识别、提示音和 V5 动画联动页面 |
+| `app/src/main/java/com/huimei/voice/avatar/VoiceAvatarStateMachine.java` | 待命与口播状态转换 |
+| `app/src/main/java/com/huimei/voice/avatar/LottieAvatarMotionController.java` | 待命时锁定闭口口型和人物位置，口播时恢复 V5 动画 |
 | `app/src/main/java/com/huimei/voice/recognition/VoiceRecognitionController.java` | 模型加载、识别器、麦克风、语言切换、暂停恢复和资源生命周期 |
 | `app/src/main/java/com/huimei/voice/recognition/CommandCatalog.java` | 每种语言的模型目录、唤醒词、固定语法和词条事件映射 |
 | `app/src/main/java/com/huimei/voice/recognition/WakeCommandStateMachine.java` | 休眠、唤醒、8秒超时和单次命令状态机 |

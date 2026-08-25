@@ -13,6 +13,15 @@
         android:theme="@style/Theme.HuimeiVoice"
         tools:targetApi="s">
         <activity
+            android:name=".VoiceAvatarActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LottieDemoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VoiceRecognitionActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

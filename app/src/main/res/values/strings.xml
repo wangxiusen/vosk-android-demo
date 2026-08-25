@@ -20,4 +20,25 @@
     <string name="event_log_title">事件日志</string>
     <string name="event_log_empty">等待事件…</string>
     <string name="command_hint">先说唤醒词，再在 8 秒内说产气时长、开机或关机。未唤醒时命令将被静默忽略。</string>
+    <string name="demo_list_title">潓美医疗示例</string>
+    <string name="demo_list_hint">选择一个功能 Demo 进入体验。</string>
+    <string name="demo_voice_title">离线语音识别 Demo</string>
+    <string name="demo_voice_summary">Vosk 中英文唤醒、固定命令、提示音与事件日志</string>
+    <string name="demo_lottie_title">医疗助手 Lottie V5 Demo</string>
+    <string name="demo_lottie_summary">离线播放医疗助手口型、眨眼与视线动画</string>
+    <string name="demo_voice_avatar_title">语音 + 医疗助手动画 Demo</string>
+    <string name="demo_voice_avatar_summary">待命时仅动眼睛，提示音播放期间驱动口型</string>
+    <string name="lottie_demo_hint">V5 动画完全从应用 Assets 加载，不需要网络。</string>
+    <string name="lottie_content_description">正在说话的医疗助手动画</string>
+    <string name="lottie_status_loading">状态：正在加载动画</string>
+    <string name="lottie_status_playing">状态：正在播放</string>
+    <string name="lottie_status_paused">状态：已暂停</string>
+    <string name="lottie_status_error">状态：加载失败（%1$s）</string>
+    <string name="play_animation">播放</string>
+    <string name="pause_animation">暂停</string>
+    <string name="replay_animation">重播</string>
+    <string name="voice_avatar_metadata_value">模型：%1$s　唤醒词：%2$s</string>
+    <string name="voice_avatar_content_description">支持语音口播的医疗助手动画</string>
+    <string name="voice_avatar_state_idle">动画：待命，仅眼睛活动</string>
+    <string name="voice_avatar_state_talking">动画：正在随提示音口播</string>
 </resources>
