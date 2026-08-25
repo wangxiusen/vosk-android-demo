@@ -1,0 +1,69 @@
+08-25 18:29:14.381 30028 30028 I HuimeiTtsPerf: model_load_request generation=1 language=CHINESE
+08-25 18:29:14.383 30028 30092 I HuimeiTtsPerf: model_load_start generation=1 language=CHINESE
+08-25 18:29:15.799 30028 30092 I HuimeiTtsPerf: model_load_end generation=1 language=CHINESE load_ms=1417 sample_rate=8000 speakers=174
+08-25 18:29:19.811 30028 30050 I HuimeiTtsPerf: test_pss label=chinese_ready pss_kb=219745 native_heap_bytes=87434992
+08-25 18:29:19.836 30028 30028 I HuimeiTtsPerf: request generation=3 language=CHINESE chars=32 punctuation=4 speaker=4 speed=1.0
+08-25 18:29:19.839 30028 30092 I HuimeiTtsPerf: worker_start generation=3 after_request_ms=3
+08-25 18:29:19.840 30028 30092 I HuimeiTtsPerf: generate_start generation=3 after_request_ms=4
+08-25 18:29:19.986 30028 30092 I HuimeiTtsPerf: callback_start generation=3 index=1 after_request_ms=151 gap_ms=-1 audio_ms=1850
+08-25 18:29:19.986 30028 30092 I HuimeiTtsPerf: first_pcm_enqueued generation=3 after_request_ms=151
+08-25 18:29:19.986 30028 30092 I HuimeiTtsPerf: callback_end generation=3 index=1 callback_ms=1
+08-25 18:29:19.987 30028 30172 I HuimeiTtsPerf: playback_chunk generation=3 index=1 queue_wait_ms=148 audio_ms=1850
+08-25 18:29:20.059 30028 30172 I HuimeiTtsPerf: first_pcm_written generation=3 after_request_ms=224
+08-25 18:29:20.093 30028 30092 I HuimeiTtsPerf: callback_start generation=3 index=2 after_request_ms=257 gap_ms=106 audio_ms=2522
+08-25 18:29:20.093 30028 30092 I HuimeiTtsPerf: callback_end generation=3 index=2 callback_ms=0
+08-25 18:29:20.152 30028 30172 I HuimeiTtsPerf: playback_started generation=3 after_request_ms=316
+08-25 18:29:20.183 30028 30092 I HuimeiTtsPerf: callback_start generation=3 index=3 after_request_ms=347 gap_ms=90 audio_ms=1957
+08-25 18:29:20.183 30028 30092 I HuimeiTtsPerf: callback_end generation=3 index=3 callback_ms=0
+08-25 18:29:20.204 30028 30092 I HuimeiTtsPerf: callback_start generation=3 index=4 after_request_ms=369 gap_ms=22 audio_ms=96
+08-25 18:29:20.204 30028 30092 I HuimeiTtsPerf: callback_end generation=3 index=4 callback_ms=0
+08-25 18:29:20.209 30028 30092 I HuimeiTtsPerf: generate_end generation=3 after_request_ms=369 audio_ms=6426 rtf=0.057 longest_quiet_ms=540
+08-25 18:29:20.314 30028 30050 I HuimeiTtsPerf: test_pss label=chinese_north_playing pss_kb=237843 native_heap_bytes=118347856
+08-25 18:29:21.986 30028 30172 I HuimeiTtsPerf: playback_chunk generation=3 index=2 queue_wait_ms=0 audio_ms=2522
+08-25 18:29:24.511 30028 30172 I HuimeiTtsPerf: playback_chunk generation=3 index=3 queue_wait_ms=0 audio_ms=1957
+08-25 18:29:26.431 30028 30172 I HuimeiTtsPerf: playback_chunk generation=3 index=4 queue_wait_ms=0 audio_ms=96
+08-25 18:29:26.674 30028 30172 I HuimeiTtsPerf: playback_end generation=3 after_request_ms=6837 underruns=1
+08-25 18:29:26.729 30028 30028 I HuimeiTtsPerf: request generation=5 language=CHINESE chars=16 punctuation=2 speaker=122 speed=1.0
+08-25 18:29:26.731 30028 30092 I HuimeiTtsPerf: worker_start generation=5 after_request_ms=2
+08-25 18:29:26.731 30028 30092 I HuimeiTtsPerf: generate_start generation=5 after_request_ms=2
+08-25 18:29:26.888 30028 30092 I HuimeiTtsPerf: callback_start generation=5 index=1 after_request_ms=160 gap_ms=-1 audio_ms=3052
+08-25 18:29:26.889 30028 30092 I HuimeiTtsPerf: first_pcm_enqueued generation=5 after_request_ms=160
+08-25 18:29:26.889 30028 30092 I HuimeiTtsPerf: callback_end generation=5 index=1 callback_ms=0
+08-25 18:29:26.889 30028 30172 I HuimeiTtsPerf: playback_chunk generation=5 index=1 queue_wait_ms=158 audio_ms=3052
+08-25 18:29:26.911 30028 30092 I HuimeiTtsPerf: callback_start generation=5 index=2 after_request_ms=182 gap_ms=22 audio_ms=96
+08-25 18:29:26.911 30028 30092 I HuimeiTtsPerf: callback_end generation=5 index=2 callback_ms=1
+08-25 18:29:26.911 30028 30092 I HuimeiTtsPerf: generate_end generation=5 after_request_ms=183 audio_ms=3148 rtf=0.058 longest_quiet_ms=240
+08-25 18:29:26.922 30028 30172 I HuimeiTtsPerf: first_pcm_written generation=5 after_request_ms=193
+08-25 18:29:27.000 30028 30172 I HuimeiTtsPerf: playback_started generation=5 after_request_ms=268
+08-25 18:29:27.065 30028 30050 I HuimeiTtsPerf: test_pss label=chinese_south_playing pss_kb=200308 native_heap_bytes=118493264
+08-25 18:29:29.992 30028 30172 I HuimeiTtsPerf: playback_chunk generation=5 index=2 queue_wait_ms=1 audio_ms=96
+08-25 18:29:30.194 30028 30172 I HuimeiTtsPerf: playback_end generation=5 after_request_ms=3466 underruns=1
+08-25 18:29:30.304 30028 30028 I HuimeiTtsPerf: model_load_request generation=2 language=ENGLISH
+08-25 18:29:30.306 30028 30092 I HuimeiTtsPerf: model_load_start generation=2 language=ENGLISH
+08-25 18:29:32.708 30028 30092 I HuimeiTtsPerf: model_load_end generation=2 language=ENGLISH load_ms=2403 sample_rate=22050 speakers=1
+08-25 18:29:32.844 30028 30050 I HuimeiTtsPerf: test_pss label=english_ready pss_kb=260005 native_heap_bytes=112259552
+08-25 18:29:32.863 30028 30028 I HuimeiTtsPerf: request generation=8 language=ENGLISH chars=98 punctuation=3 speaker=0 speed=1.0
+08-25 18:29:32.865 30028 30092 I HuimeiTtsPerf: worker_start generation=8 after_request_ms=4
+08-25 18:29:32.865 30028 30092 I HuimeiTtsPerf: generate_start generation=8 after_request_ms=4
+08-25 18:29:33.027 30028 30092 I HuimeiTtsPerf: callback_start generation=8 index=1 after_request_ms=165 gap_ms=-1 audio_ms=1753
+08-25 18:29:33.027 30028 30092 I HuimeiTtsPerf: first_pcm_enqueued generation=8 after_request_ms=166
+08-25 18:29:33.027 30028 30092 I HuimeiTtsPerf: callback_end generation=8 index=1 callback_ms=1
+08-25 18:29:33.028 30028 30172 I HuimeiTtsPerf: playback_chunk generation=8 index=1 queue_wait_ms=163 audio_ms=1753
+08-25 18:29:33.061 30028 30172 I HuimeiTtsPerf: first_pcm_written generation=8 after_request_ms=199
+08-25 18:29:33.125 30028 30172 I HuimeiTtsPerf: playback_started generation=8 after_request_ms=264
+08-25 18:29:33.216 30028 30050 I HuimeiTtsPerf: test_pss label=english_playing pss_kb=272561 native_heap_bytes=178063808
+08-25 18:29:33.345 30028 30092 I HuimeiTtsPerf: callback_start generation=8 index=2 after_request_ms=484 gap_ms=318 audio_ms=4167
+08-25 18:29:33.346 30028 30092 I HuimeiTtsPerf: callback_end generation=8 index=2 callback_ms=0
+08-25 18:29:33.346 30028 30092 I HuimeiTtsPerf: generate_end generation=8 after_request_ms=484 audio_ms=5920 rtf=0.082 longest_quiet_ms=200
+08-25 18:29:34.834 30028 30172 I HuimeiTtsPerf: playback_chunk generation=8 index=2 queue_wait_ms=0 audio_ms=4167
+08-25 18:29:39.170 30028 30172 I HuimeiTtsPerf: playback_end generation=8 after_request_ms=6308 underruns=1
+08-25 18:29:39.230 30028 30028 I HuimeiTtsPerf: request generation=10 language=ENGLISH chars=157 punctuation=3 speaker=0 speed=1.0
+08-25 18:29:39.232 30028 30092 I HuimeiTtsPerf: worker_start generation=10 after_request_ms=3
+08-25 18:29:39.233 30028 30092 I HuimeiTtsPerf: generate_start generation=10 after_request_ms=3
+08-25 18:29:39.466 30028 30092 I HuimeiTtsPerf: callback_start generation=10 index=1 after_request_ms=236 gap_ms=-1 audio_ms=2623
+08-25 18:29:39.466 30028 30092 I HuimeiTtsPerf: first_pcm_enqueued generation=10 after_request_ms=236
+08-25 18:29:39.466 30028 30092 I HuimeiTtsPerf: callback_end generation=10 index=1 callback_ms=0
+08-25 18:29:39.466 30028 30172 I HuimeiTtsPerf: playback_chunk generation=10 index=1 queue_wait_ms=234 audio_ms=2623
+08-25 18:29:39.504 30028 30172 I HuimeiTtsPerf: first_pcm_written generation=10 after_request_ms=275
+08-25 18:29:39.587 30028 30172 I HuimeiTtsPerf: playback_started generation=10 after_request_ms=358
+08-25 18:29:39.802 30028 30092 I HuimeiTtsPerf: generate_end generation=10 after_request_ms=565 audio_ms=7026 rtf=0.080 longest_quiet_ms=160

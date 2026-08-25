@@ -14,7 +14,11 @@ public enum DemoDestination {
     VOICE_AVATAR(
             R.string.demo_voice_avatar_title,
             R.string.demo_voice_avatar_summary,
-            VoiceAvatarActivity.class);
+            VoiceAvatarActivity.class),
+    ARBITRARY_TTS_AVATAR(
+            R.string.demo_tts_avatar_title,
+            R.string.demo_tts_avatar_summary,
+            ArbitraryTtsActivity.class);
 
     private final int titleResourceId;
     private final int summaryResourceId;

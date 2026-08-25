@@ -1,0 +1,52 @@
+Device: Huawei HMA-AL00, Kirin 980, Android 10 (API 29)
+Engine: sherpa-onnx 1.13.6, kokoro-int8-multi-lang-v1_1
+Voice speed: 1.0x
+Tag: HuimeiTtsPerf
+
+CASE 1 - Chinese default text with punctuation
+Text: 潓美医疗提醒您，请根据设备说明安全使用氧气机。
+
+request generation=2 chars=23 punctuation=2 speaker=3 speed=1.0
+worker_start generation=2 after_request_ms=1
+generate_start generation=2 after_request_ms=38
+callback_start generation=2 index=1 after_request_ms=3597 gap_ms=-1 audio_ms=1756 underruns=0
+first_pcm_written generation=2 after_request_ms=3607
+callback_end generation=2 index=1 callback_ms=1780 underruns=0
+callback_start generation=2 index=2 after_request_ms=11305 gap_ms=5928 audio_ms=3208 underruns=1
+callback_end generation=2 index=2 callback_ms=3246 underruns=1
+generate_end generation=2 after_request_ms=14552 audio_ms=4965 longest_quiet_ms=200
+playback_end generation=2 after_request_ms=14613 underruns=2
+
+CASE 2 - English, same words without punctuation
+Text: Huimei Medical reminds you please use the oxygen concentrator safely please keep the room ventilated please check the device status
+
+request generation=3 chars=131 punctuation=0 speaker=0 speed=1.0
+worker_start generation=3 after_request_ms=1
+generate_start generation=3 after_request_ms=33
+callback_start generation=3 index=1 after_request_ms=11605 gap_ms=-1 audio_ms=6874 underruns=0
+first_pcm_written generation=3 after_request_ms=11617
+callback_end generation=3 index=1 callback_ms=6916 underruns=0
+generate_end generation=3 after_request_ms=18522 audio_ms=6874 longest_quiet_ms=200
+playback_end generation=3 after_request_ms=18584 underruns=1
+
+CASE 3 - English, same words with punctuation
+Text: Huimei Medical reminds you, please use the oxygen concentrator safely. Please keep the room ventilated. Please check the device status.
+
+request generation=4 chars=135 punctuation=4 speaker=0 speed=1.0
+worker_start generation=4 after_request_ms=1
+generate_start generation=4 after_request_ms=20
+callback_start generation=4 index=1 after_request_ms=6930 gap_ms=-1 audio_ms=3889 underruns=0
+first_pcm_written generation=4 after_request_ms=6939
+callback_end generation=4 index=1 callback_ms=3926 underruns=0
+callback_start generation=4 index=2 after_request_ms=14199 gap_ms=3343 audio_ms=1614 underruns=1
+callback_end generation=4 index=2 callback_ms=1602 underruns=1
+callback_start generation=4 index=3 after_request_ms=19368 gap_ms=3566 audio_ms=1751 underruns=2
+callback_end generation=4 index=3 callback_ms=1785 underruns=2
+generate_end generation=4 after_request_ms=21153 audio_ms=7255 longest_quiet_ms=260
+playback_end generation=4 after_request_ms=21214 underruns=3
+
+Memory after the tests
+PSS total: 562832 KB
+Native heap PSS: 468788 KB
+Java heap PSS: 19284 KB
+Graphics PSS: 25608 KB

@@ -31,10 +31,7 @@ public final class LottieAvatarMotionController {
     }
 
     public void showIdleEyesOnly() {
-        setOpacity(MOUTH_CLOSED, 100);
-        setOpacity(MOUTH_SMALL, 0);
-        setOpacity(MOUTH_MEDIUM, 0);
-        setOpacity(MOUTH_OPEN, 0);
+        showMouth(MouthShape.CLOSED);
         animationView.addValueCallback(
                 new KeyPath(CHARACTER_CONTROLLER),
                 LottieProperty.TRANSFORM_POSITION,
@@ -43,6 +40,13 @@ public final class LottieAvatarMotionController {
                 new KeyPath(CHARACTER_CONTROLLER),
                 LottieProperty.TRANSFORM_SCALE,
                 new LottieValueCallback<>(new ScaleXY(1.0f, 1.0f)));
+    }
+
+    public void showMouth(MouthShape shape) {
+        setOpacity(MOUTH_CLOSED, shape == MouthShape.CLOSED ? 100 : 0);
+        setOpacity(MOUTH_SMALL, shape == MouthShape.SMALL ? 100 : 0);
+        setOpacity(MOUTH_MEDIUM, shape == MouthShape.MEDIUM ? 100 : 0);
+        setOpacity(MOUTH_OPEN, shape == MouthShape.OPEN ? 100 : 0);
     }
 
     public void showTalking() {

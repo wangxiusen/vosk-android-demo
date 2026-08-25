@@ -28,6 +28,8 @@
     <string name="demo_lottie_summary">离线播放医疗助手口型、眨眼与视线动画</string>
     <string name="demo_voice_avatar_title">语音 + 医疗助手动画 Demo</string>
     <string name="demo_voice_avatar_summary">待命时仅动眼睛，提示音播放期间驱动口型</string>
+    <string name="demo_tts_avatar_title">任意文字口播动画 Demo</string>
+    <string name="demo_tts_avatar_summary">离线中英文 TTS、女声和语速切换、实时嘴型</string>
     <string name="lottie_demo_hint">V5 动画完全从应用 Assets 加载，不需要网络。</string>
     <string name="lottie_content_description">正在说话的医疗助手动画</string>
     <string name="lottie_status_loading">状态：正在加载动画</string>
@@ -41,4 +43,20 @@
     <string name="voice_avatar_content_description">支持语音口播的医疗助手动画</string>
     <string name="voice_avatar_state_idle">动画：待命，仅眼睛活动</string>
     <string name="voice_avatar_state_talking">动画：正在随提示音口播</string>
+    <string name="tts_hint">输入任意中文或英文文字。模型完全离线运行，首次进入需要复制模型数据。</string>
+    <string name="tts_language_label">口播语言</string>
+    <string name="tts_voice_label">女声音色</string>
+    <string name="tts_speed_label">语速</string>
+    <string name="tts_text_label">口播文字</string>
+    <string name="tts_play">开始口播</string>
+    <string name="tts_stop">停止</string>
+    <string name="tts_status_loading">状态：正在初始化离线 TTS 模型…</string>
+    <string name="tts_status_switching">状态：正在加载%1$s女声模型…</string>
+    <string name="tts_status_ready">状态：模型已就绪（%1$d 个可用声音）</string>
+    <string name="tts_status_playing">状态：正在使用%1$s、%2$s口播</string>
+    <string name="tts_status_stopped">状态：口播已停止</string>
+    <string name="tts_status_completed">状态：口播完成</string>
+    <string name="tts_status_error">状态：%1$s</string>
+    <string name="tts_empty_text">请输入需要口播的文字</string>
+    <string name="tts_avatar_content_description">随离线文字语音活动嘴型的医疗助手</string>
 </resources>

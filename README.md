@@ -1,6 +1,6 @@
 # 潓美医疗 Vosk 离线语音 Demo
 
-这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5，以及语音与动画联动三个 Demo，均完全离线运行。
+这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动，以及任意文字离线口播四个 Demo，均完全离线运行。
 
 ## 功能
 
@@ -13,6 +13,8 @@
 - 使用 Android 原生 `MediaPlayer` 离线播放中英文唤醒、1 小时产气和 8 小时产气提示音。
 - 使用 Lottie Android 离线加载医疗助手 V5，支持循环播放、暂停和重播。
 - 语音与动画联动页在待命时固定人物和闭口口型，仅保留眼睛动画；播放提示音时恢复口型，播放结束后自动回到待命。
+- 任意文字口播页使用 sherpa-onnx 和分语言 VITS 模型：中文 AISHELL3 两种女声，英文 Piper LJSpeech 女声；可切换 0.8/1.0/1.2 三档语速，并按 PCM 能量实时驱动四个嘴型。
+- 中英文 TTS 模型按当前语言切换，内存中只保留一套；生成回调只把 PCM 放入有界队列，播放线程独立消费，避免标点分句时的数秒断口。
 
 ## 命令
 
@@ -65,7 +67,10 @@ app/build/outputs/apk/debug/app-debug.apk
 - `VoiceRecognitionActivity`：权限、语言按钮、状态和日志 UI。
 - `LottieDemoActivity`：从 `app/src/main/assets/medical-assistant-talking-v5.json` 加载并控制医疗助手动画。
 - `VoiceAvatarActivity`：组合语音识别、提示音和医疗助手动画。
-- `LottieAvatarMotionController`：在待命和口播状态间切换口型及人物位移动画。
+- `ArbitraryTtsActivity`：任意文字、语言、女声、语速和口播动画 UI。
+- `LightweightTtsConfigFactory`：配置中文 AISHELL3 和英文 Piper LJSpeech VITS 模型。
+- `OfflineTtsPlayer`：按语言加载模型，将流式生成与 `AudioTrack` 播放解耦。
+- `LottieAvatarMotionController`：控制待命位置及闭口、小口、中口、大口四个嘴型。
 
 ## 中文模型词表说明
 

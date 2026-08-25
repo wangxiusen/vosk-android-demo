@@ -30,10 +30,16 @@ public final class DemoDestinationTest {
         }
 
         assertArrayEquals(
-                new String[]{"VOICE_RECOGNITION", "LOTTIE_AVATAR", "VOICE_AVATAR"},
+                new String[]{
+                        "VOICE_RECOGNITION",
+                        "LOTTIE_AVATAR",
+                        "VOICE_AVATAR",
+                        "ARBITRARY_TTS_AVATAR"
+                },
                 names);
         assertEquals("com.huimei.voice.VoiceRecognitionActivity", activityClassNames[0]);
         assertEquals("com.huimei.voice.LottieDemoActivity", activityClassNames[1]);
         assertEquals("com.huimei.voice.VoiceAvatarActivity", activityClassNames[2]);
+        assertEquals("com.huimei.voice.ArbitraryTtsActivity", activityClassNames[3]);
     }
 }
