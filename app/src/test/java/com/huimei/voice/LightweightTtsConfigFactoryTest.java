@@ -69,6 +69,6 @@ public final class LightweightTtsConfigFactoryTest {
         assertFalse(config.getModel().getDebug());
         assertEquals("cpu", config.getModel().getProvider());
         assertEquals(1, config.getMaxNumSentences());
-        assertEquals(0.2f, config.getSilenceScale(), 0.0001f);
+        assertEquals(1.0f, config.getSilenceScale(), 0.0001f);
     }
 }

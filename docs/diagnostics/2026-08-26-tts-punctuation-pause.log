@@ -1,0 +1,42 @@
+Device: Xiaomi 2201122C / Android 15 / arm64-v8a
+Test text: 设备正在运行，请注意安全。发生异常时，请立即停机。
+
+request generation=3 chars=25 punctuation=4 speaker=4 speed=1.0 silence_scale=0.5
+first_pcm_enqueued generation=3 after_request_ms=195
+generate_end generation=3 audio_ms=5510 rtf=0.100 longest_quiet_ms=1040
+playback_chunk generation=3 index=2 queue_wait_ms=0 audio_ms=2406
+playback_chunk generation=3 index=3 queue_wait_ms=0 audio_ms=304
+
+request generation=5 chars=25 punctuation=4 speaker=4 speed=1.0 silence_scale=1.0
+first_pcm_enqueued generation=5 after_request_ms=138
+generate_end generation=5 audio_ms=6720 rtf=0.039 longest_quiet_ms=1320
+playback_chunk generation=5 index=2 queue_wait_ms=0 audio_ms=3072
+playback_chunk generation=5 index=3 queue_wait_ms=0 audio_ms=512
+
+request generation=7 chars=25 punctuation=4 speaker=4 speed=1.0 silence_scale=1.5
+first_pcm_enqueued generation=7 after_request_ms=126
+generate_end generation=7 audio_ms=8100 rtf=0.031 longest_quiet_ms=1600
+playback_chunk generation=7 index=2 queue_wait_ms=0 audio_ms=3658
+playback_chunk generation=7 index=3 queue_wait_ms=0 audio_ms=768
+
+English test text: Please check the device, and remain calm. Stop the machine, if an alarm occurs.
+
+request generation=12 language=ENGLISH chars=79 punctuation=4 speaker=0 speed=1.0 silence_scale=0.5
+first_pcm_enqueued generation=12 after_request_ms=232
+generate_end generation=12 audio_ms=5434 rtf=0.086 longest_quiet_ms=200
+playback_chunk generation=12 index=2 queue_wait_ms=0 audio_ms=2822
+
+request generation=14 language=ENGLISH chars=79 punctuation=4 speaker=0 speed=1.0 silence_scale=1.0
+first_pcm_enqueued generation=14 after_request_ms=230
+generate_end generation=14 audio_ms=5514 rtf=0.081 longest_quiet_ms=300
+playback_chunk generation=14 index=2 queue_wait_ms=0 audio_ms=2960
+
+request generation=16 language=ENGLISH chars=79 punctuation=4 speaker=0 speed=1.0 silence_scale=1.5
+first_pcm_enqueued generation=16 after_request_ms=213
+generate_end generation=16 audio_ms=5773 rtf=0.076 longest_quiet_ms=680
+playback_chunk generation=16 index=2 queue_wait_ms=0 audio_ms=3405
+
+Gradle result:
+Finished 2 tests on 2201122C - 15
+BUILD SUCCESSFUL in 1m 9s
+146 actionable tasks: 10 executed, 136 up-to-date

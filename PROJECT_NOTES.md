@@ -1,6 +1,6 @@
 # 潓美医疗离线语音 Demo：功能与工程知识记录
 
-> 更新日期：2026-08-25
+> 更新日期：2026-08-26
 >
 > 当前分支：`feat/huimei-voice-demo`
 >
@@ -89,7 +89,7 @@ docs/      已确认的设计文档和实施计划
 - “离线语音识别 Demo”进入原有语音页面。
 - “医疗助手 Lottie V5 Demo”从应用 Assets 离线加载动画，支持循环播放、暂停和重播。
 - “语音 + 医疗助手动画 Demo”复用原有中英文识别和提示音逻辑。待命时人物居中、闭口并仅保留眼睛活动；提示音播放期间恢复 V5 口型，结束或失败后自动恢复待命。
-- “任意文字口播动画 Demo”支持中英文文本、两种女声音色和 0.8/1.0/1.2 三档语速；TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
+- “任意文字口播动画 Demo”支持中英文文本、两种女声音色、0.8/1.0/1.2 三档语速和短/标准/长三档标点停顿；停顿倍率分别为 0.5×、1.0×、1.5×，默认标准档。TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
 
 V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包含口型、眨眼和视线动画所需的内嵌图片，不依赖网络资源。
 
@@ -126,13 +126,14 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 | `app/src/main/java/com/huimei/voice/VoiceRecognitionActivity.java` | 权限、语言按钮、UI状态、日志、提示音触发 |
 | `app/src/main/java/com/huimei/voice/LottieDemoActivity.java` | V5 动画加载、播放、暂停、重播和生命周期管理 |
 | `app/src/main/java/com/huimei/voice/VoiceAvatarActivity.java` | 中英文识别、提示音和 V5 动画联动页面 |
-| `app/src/main/java/com/huimei/voice/ArbitraryTtsActivity.java` | 任意文字 TTS、语言、女声、语速和动画 UI |
+| `app/src/main/java/com/huimei/voice/ArbitraryTtsActivity.java` | 任意文字 TTS、语言、女声、语速、标点停顿和动画 UI |
 | `app/src/main/java/com/huimei/voice/avatar/VoiceAvatarStateMachine.java` | 待命与口播状态转换 |
 | `app/src/main/java/com/huimei/voice/avatar/LottieAvatarMotionController.java` | 待命时锁定闭口口型和人物位置，口播时恢复 V5 动画 |
 | `app/src/main/java/com/huimei/voice/avatar/AudioEnergyMouthMapper.java` | PCM 均方根能量到四个嘴型的映射 |
 | `app/src/main/java/com/huimei/voice/tts/LightweightTtsConfigFactory.java` | 中文 AISHELL3 和英文 Piper LJSpeech VITS 配置 |
 | `app/src/main/java/com/huimei/voice/tts/PcmChunkQueue.java` | 生成线程与播放线程之间的有界、可取消 PCM 队列 |
 | `app/src/main/java/com/huimei/voice/tts/OfflineTtsPlayer.java` | 模型切换、流式合成、队列播放、停止和释放 |
+| `app/src/main/java/com/huimei/voice/tts/TtsPause.java` | 短、标准、长三档标点静音倍率 |
 | `app/src/main/java/com/huimei/voice/tts/TtsVoiceCatalog.java` | AISHELL3 中文女声和 LJSpeech 英文女声 speaker ID 映射 |
 | `app/src/main/java/com/huimei/voice/recognition/VoiceRecognitionController.java` | 模型加载、识别器、麦克风、语言切换、暂停恢复和资源生命周期 |
 | `app/src/main/java/com/huimei/voice/recognition/CommandCatalog.java` | 每种语言的模型目录、唤醒词、固定语法和词条事件映射 |

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import com.huimei.voice.tts.TtsLanguage;
+import com.huimei.voice.tts.TtsPause;
 import com.huimei.voice.tts.TtsSpeed;
 
 import org.junit.Test;
@@ -19,6 +20,13 @@ public final class TtsOptionPresentationTest {
     public void speedOptionsProvideVisibleLabels() {
         for (TtsSpeed speed : TtsSpeed.values()) {
             assertFalse(speed.displayName().trim().isEmpty());
+        }
+    }
+
+    @Test
+    public void pauseOptionsProvideVisibleLabels() {
+        for (TtsPause pause : TtsPause.values()) {
+            assertFalse(pause.displayName().trim().isEmpty());
         }
     }
 }

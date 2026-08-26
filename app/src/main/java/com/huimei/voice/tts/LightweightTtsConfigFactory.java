@@ -43,7 +43,7 @@ public final class LightweightTtsConfigFactory {
 
         config.setModel(model);
         config.setMaxNumSentences(1);
-        config.setSilenceScale(0.2f);
+        config.setSilenceScale(TtsPause.NATURAL.silenceScale());
         return config;
     }
 }

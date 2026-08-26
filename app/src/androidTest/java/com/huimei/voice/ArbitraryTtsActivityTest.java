@@ -13,6 +13,8 @@ import android.widget.TextView;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.huimei.voice.tts.TtsPause;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -26,21 +28,37 @@ public final class ArbitraryTtsActivityTest {
     private static final long PLAYBACK_TIMEOUT_MILLIS = 120_000L;
 
     @Test
-    public void speaksBothChineseVoicesAndEnglishThenStops() {
+    public void comparesPunctuationPausesSpeaksBothVoicesAndEnglishThenStops() {
         try (ActivityScenario<ArbitraryTtsActivity> scenario =
                      ActivityScenario.launch(ArbitraryTtsActivity.class)) {
             waitForPlayEnabled(scenario, MODEL_TIMEOUT_MILLIS);
             logPss("chinese_ready");
 
+            String chinesePauseText =
+                    "设备正在运行，请注意安全。发生异常时，请立即停机。";
             speakAndWait(
                     scenario,
-                    "潓美医疗提醒您。设备正在运行，请注意安全；如有异常，请立即检查。",
+                    chinesePauseText,
                     0,
-                    "chinese_north");
+                    TtsPause.SHORT,
+                    "chinese_pause_short");
+            speakAndWait(
+                    scenario,
+                    chinesePauseText,
+                    0,
+                    TtsPause.NATURAL,
+                    "chinese_pause_natural");
+            speakAndWait(
+                    scenario,
+                    chinesePauseText,
+                    0,
+                    TtsPause.LONG,
+                    "chinese_pause_long");
             speakAndWait(
                     scenario,
                     "氧气机运行正常，请注意用氧安全。",
                     1,
+                    TtsPause.NATURAL,
                     "chinese_south");
 
             scenario.onActivity(activity -> {
@@ -50,12 +68,27 @@ public final class ArbitraryTtsActivityTest {
             });
             waitForPlayEnabled(scenario, MODEL_TIMEOUT_MILLIS);
             logPss("english_ready");
+            String englishPauseText =
+                    "Please check the device, and remain calm. Stop the machine, "
+                            + "if an alarm occurs.";
             speakAndWait(
                     scenario,
-                    "Huimei Medical is ready. The oxygen concentrator is running, "
-                            + "and the system is operating normally.",
+                    englishPauseText,
                     0,
-                    "english");
+                    TtsPause.SHORT,
+                    "english_pause_short");
+            speakAndWait(
+                    scenario,
+                    englishPauseText,
+                    0,
+                    TtsPause.NATURAL,
+                    "english_pause_natural");
+            speakAndWait(
+                    scenario,
+                    englishPauseText,
+                    0,
+                    TtsPause.LONG,
+                    "english_pause_long");
 
             scenario.onActivity(activity -> {
                 EditText input = activity.findViewById(R.id.tts_text_input);
@@ -79,10 +112,13 @@ public final class ArbitraryTtsActivityTest {
             ActivityScenario<ArbitraryTtsActivity> scenario,
             String text,
             int voiceIndex,
+            TtsPause pause,
             String metricLabel) {
         scenario.onActivity(activity -> {
             Spinner voice = activity.findViewById(R.id.tts_voice_spinner);
             voice.setSelection(voiceIndex);
+            Spinner pauseSpinner = activity.findViewById(R.id.tts_pause_spinner);
+            pauseSpinner.setSelection(pause.ordinal());
             EditText input = activity.findViewById(R.id.tts_text_input);
             input.setText(text);
             Button play = activity.findViewById(R.id.tts_play_button);

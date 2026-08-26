@@ -17,6 +17,7 @@ import com.huimei.voice.avatar.LottieAvatarMotionController;
 import com.huimei.voice.avatar.MouthShape;
 import com.huimei.voice.tts.OfflineTtsPlayer;
 import com.huimei.voice.tts.TtsLanguage;
+import com.huimei.voice.tts.TtsPause;
 import com.huimei.voice.tts.TtsSpeed;
 import com.huimei.voice.tts.TtsVoiceCatalog;
 import com.huimei.voice.tts.TtsVoiceOption;
@@ -32,6 +33,7 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
     private RadioGroup languageGroup;
     private Spinner voiceSpinner;
     private Spinner speedSpinner;
+    private Spinner pauseSpinner;
     private EditText textInput;
     private Button playButton;
     private Button stopButton;
@@ -65,6 +67,7 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
         languageGroup = findViewById(R.id.tts_language_group);
         voiceSpinner = findViewById(R.id.tts_voice_spinner);
         speedSpinner = findViewById(R.id.tts_speed_spinner);
+        pauseSpinner = findViewById(R.id.tts_pause_spinner);
         textInput = findViewById(R.id.tts_text_input);
         playButton = findViewById(R.id.tts_play_button);
         stopButton = findViewById(R.id.tts_stop_button);
@@ -80,6 +83,13 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
         }
         speedSpinner.setAdapter(createAdapter(speedLabels));
         speedSpinner.setSelection(TtsSpeed.NORMAL.ordinal());
+
+        List<String> pauseLabels = new ArrayList<>();
+        for (TtsPause pause : TtsPause.values()) {
+            pauseLabels.add(pause.displayName());
+        }
+        pauseSpinner.setAdapter(createAdapter(pauseLabels));
+        pauseSpinner.setSelection(TtsPause.NATURAL.ordinal());
 
         languageGroup.setOnCheckedChangeListener((group, checkedId) -> {
             if (checkedId == View.NO_ID) {
@@ -138,7 +148,8 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
         }
         TtsVoiceOption voice = currentVoices.get(voiceSpinner.getSelectedItemPosition());
         TtsSpeed speed = TtsSpeed.values()[speedSpinner.getSelectedItemPosition()];
-        if (!player.speak(text, voice, speed)) {
+        TtsPause pause = TtsPause.values()[pauseSpinner.getSelectedItemPosition()];
+        if (!player.speak(text, voice, speed, pause)) {
             onError("模型尚未就绪，暂时无法口播");
         }
     }
@@ -156,10 +167,12 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
         playing = true;
         TtsVoiceOption voice = currentVoices.get(voiceSpinner.getSelectedItemPosition());
         TtsSpeed speed = TtsSpeed.values()[speedSpinner.getSelectedItemPosition()];
+        TtsPause pause = TtsPause.values()[pauseSpinner.getSelectedItemPosition()];
         statusText.setText(getString(
                 R.string.tts_status_playing,
                 voice.displayName(),
-                speed.displayName()));
+                speed.displayName(),
+                pause.displayName()));
         updateControlState();
     }
 
@@ -199,6 +212,7 @@ public final class ArbitraryTtsActivity extends AppCompatActivity
         setRadioChildrenEnabled(languageGroup, !playing);
         voiceSpinner.setEnabled(!playing);
         speedSpinner.setEnabled(!playing);
+        pauseSpinner.setEnabled(!playing);
         textInput.setEnabled(!playing);
         playButton.setEnabled(modelReady && !playing);
         stopButton.setEnabled(playing);

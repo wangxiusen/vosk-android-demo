@@ -85,7 +85,11 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 requestedAtMillis));
     }
 
-    public boolean speak(String text, TtsVoiceOption voice, TtsSpeed speed) {
+    public boolean speak(
+            String text,
+            TtsVoiceOption voice,
+            TtsSpeed speed,
+            TtsPause pause) {
         OfflineTts currentTts = tts;
         TtsLanguage currentLanguage = loadedLanguage;
         if (closed.get()
@@ -104,6 +108,7 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 normalizedText,
                 voice.speakerId(),
                 speed.rate(),
+                pause.silenceScale(),
                 currentTts.sampleRate(),
                 SystemClock.elapsedRealtime());
         activeSession = session;
@@ -114,7 +119,8 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                         + " chars=" + normalizedText.length()
                         + " punctuation=" + countPunctuation(normalizedText)
                         + " speaker=" + voice.speakerId()
-                        + " speed=" + speed.rate());
+                        + " speed=" + speed.rate()
+                        + " silence_scale=" + pause.silenceScale());
         modelWorker.execute(() -> synthesize(session, currentTts));
         playbackWorker.execute(() -> play(session));
         return true;
@@ -190,7 +196,7 @@ public final class OfflineTtsPlayer implements AutoCloseable {
             GenerationConfig config = new GenerationConfig();
             config.setSid(session.speakerId);
             config.setSpeed(session.speed);
-            config.setSilenceScale(0.2f);
+            config.setSilenceScale(session.silenceScale);
 
             Log.i(PERFORMANCE_TAG,
                     "generate_start generation=" + session.generation
@@ -619,6 +625,7 @@ public final class OfflineTtsPlayer implements AutoCloseable {
         private final String text;
         private final int speakerId;
         private final float speed;
+        private final float silenceScale;
         private final int sampleRate;
         private final int samplesPerFrame;
         private final long requestedAtMillis;
@@ -633,12 +640,14 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 String text,
                 int speakerId,
                 float speed,
+                float silenceScale,
                 int sampleRate,
                 long requestedAtMillis) {
             this.generation = generation;
             this.text = text;
             this.speakerId = speakerId;
             this.speed = speed;
+            this.silenceScale = silenceScale;
             this.sampleRate = sampleRate;
             this.samplesPerFrame = Math.max(
                     1,
