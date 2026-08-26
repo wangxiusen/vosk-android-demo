@@ -1,0 +1,24 @@
+Device: Xiaomi 2201122C / Android 15 / arm64-v8a
+Chinese model speakers: 174
+Selected female speaker IDs: 4, 122, 0, 1, 16, 19, 57, 104, 113, 147
+
+speaker=4 generate_end after_request_ms=269 audio_ms=6880
+speaker=122 generate_end after_request_ms=189 audio_ms=4352
+speaker=0 generate_end after_request_ms=189 audio_ms=4352
+speaker=1 generate_end after_request_ms=146 audio_ms=3232
+speaker=16 generate_end after_request_ms=179 audio_ms=3296
+speaker=19 generate_end after_request_ms=168 audio_ms=3520
+speaker=57 generate_end after_request_ms=166 audio_ms=3424
+speaker=104 generate_end after_request_ms=167 audio_ms=3616
+speaker=113 generate_end after_request_ms=164 audio_ms=3424
+speaker=147 generate_end after_request_ms=138 audio_ms=3040
+
+Focused device test:
+Finished 1 tests on 2201122C - 15
+BUILD SUCCESSFUL in 1m 38s
+81 actionable tasks: 5 executed, 76 up-to-date
+
+Full regression:
+Finished 3 tests on 2201122C - 15
+BUILD SUCCESSFUL in 1m 41s
+146 actionable tasks: 11 executed, 135 up-to-date

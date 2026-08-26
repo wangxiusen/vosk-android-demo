@@ -8,7 +8,9 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public final class TtsVoiceCatalogTest {
     @Test
@@ -28,7 +30,7 @@ public final class TtsVoiceCatalogTest {
                 languageClass,
                 voicesFor,
                 "CHINESE",
-                new int[]{4, 122},
+                new int[]{4, 122, 0, 1, 16, 19, 57, 104, 113, 147},
                 "中文女声");
         assertVoices(
                 languageClass,
@@ -49,11 +51,14 @@ public final class TtsVoiceCatalogTest {
         @SuppressWarnings("unchecked")
         List<Object> voices = (List<Object>) voicesFor.invoke(null, language);
         assertEquals(expectedIds.length, voices.size());
+        Set<Integer> actualIds = new HashSet<>();
         for (int index = 0; index < expectedIds.length; index++) {
             Object voice = voices.get(index);
-            assertEquals(
-                    expectedIds[index],
-                    voice.getClass().getMethod("speakerId").invoke(voice));
+            int speakerId = (int) voice.getClass()
+                    .getMethod("speakerId")
+                    .invoke(voice);
+            assertEquals(expectedIds[index], speakerId);
+            assertTrue("speaker IDs must be unique", actualIds.add(speakerId));
             String displayName = (String) voice.getClass()
                     .getMethod("displayName")
                     .invoke(voice);

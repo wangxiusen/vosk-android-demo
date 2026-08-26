@@ -28,7 +28,7 @@ public final class ArbitraryTtsActivityTest {
     private static final long PLAYBACK_TIMEOUT_MILLIS = 120_000L;
 
     @Test
-    public void comparesPunctuationPausesSpeaksBothVoicesAndEnglishThenStops() {
+    public void comparesPausesSpeaksAllChineseVoicesAndEnglishThenStops() {
         try (ActivityScenario<ArbitraryTtsActivity> scenario =
                      ActivityScenario.launch(ArbitraryTtsActivity.class)) {
             waitForPlayEnabled(scenario, MODEL_TIMEOUT_MILLIS);
@@ -59,7 +59,15 @@ public final class ArbitraryTtsActivityTest {
                     "氧气机运行正常，请注意用氧安全。",
                     1,
                     TtsPause.NATURAL,
-                    "chinese_south");
+                    "chinese_voice_02");
+            for (int voiceIndex = 2; voiceIndex < 10; voiceIndex++) {
+                speakAndWait(
+                        scenario,
+                        "潓美医疗，设备运行正常。",
+                        voiceIndex,
+                        TtsPause.NATURAL,
+                        "chinese_voice_" + (voiceIndex + 1));
+            }
 
             scenario.onActivity(activity -> {
                 RadioGroup languageGroup = activity.findViewById(
