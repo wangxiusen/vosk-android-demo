@@ -89,7 +89,8 @@ public final class OfflineTtsPlayer implements AutoCloseable {
             String text,
             TtsVoiceOption voice,
             TtsSpeed speed,
-            TtsPause pause) {
+            TtsPause pause,
+            TtsVolume volume) {
         OfflineTts currentTts = tts;
         TtsLanguage currentLanguage = loadedLanguage;
         if (closed.get()
@@ -109,6 +110,7 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 voice.speakerId(),
                 speed.rate(),
                 pause.silenceScale(),
+                volume.targetRmsDbfs(),
                 currentTts.sampleRate(),
                 SystemClock.elapsedRealtime());
         activeSession = session;
@@ -120,7 +122,8 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                         + " punctuation=" + countPunctuation(normalizedText)
                         + " speaker=" + voice.speakerId()
                         + " speed=" + speed.rate()
-                        + " silence_scale=" + pause.silenceScale());
+                        + " silence_scale=" + pause.silenceScale()
+                        + " target_rms_dbfs=" + volume.targetRmsDbfs());
         modelWorker.execute(() -> synthesize(session, currentTts));
         playbackWorker.execute(() -> play(session));
         return true;
@@ -246,6 +249,14 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                     break;
                 }
                 chunkIndex++;
+                long analysisStartedAtMillis = SystemClock.elapsedRealtime();
+                PcmLoudnessNormalizer.Result loudness =
+                        PcmLoudnessNormalizer.analyze(samples, session.targetRmsDbfs);
+                long analysisMillis = elapsedSince(analysisStartedAtMillis);
+                float endGain = loudness.gain();
+                float startGain = Float.isNaN(session.previousGain)
+                        ? endGain
+                        : Math.min(session.previousGain, endGain);
                 Log.i(PERFORMANCE_TAG,
                         "playback_chunk generation=" + session.generation
                                 + " index=" + chunkIndex
@@ -253,13 +264,37 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                                 + " audio_ms=" + samplesToMillis(
                                         samples.length,
                                         session.sampleRate));
+                Log.i(PERFORMANCE_TAG,
+                        "loudness generation=" + session.generation
+                                + " index=" + chunkIndex
+                                + " analysis_ms=" + analysisMillis
+                                + " active=" + loudness.hasActiveAudio()
+                                + " input_active_rms_dbfs="
+                                + formatDb(loudness.inputActiveRmsDbfs())
+                                + " input_peak_dbfs="
+                                + formatDb(loudness.inputPeakDbfs())
+                                + " target_rms_dbfs="
+                                + formatDb(session.targetRmsDbfs)
+                                + " gain_db=" + formatDb(loudness.gainDb())
+                                + " peak_limited=" + loudness.isPeakLimited()
+                                + " output_active_rms_dbfs="
+                                + formatDb(loudness.outputActiveRmsDbfs())
+                                + " output_peak_dbfs="
+                                + formatDb(loudness.outputPeakDbfs()));
                 if (track == null) {
                     track = createAudioTrack(session.sampleRate);
                     audioTrack = track;
                     int initialLength = Math.min(
                             session.samplesPerFrame,
                             samples.length);
-                    writeFrame(session, track, samples, 0, initialLength);
+                    writeFrame(
+                            session,
+                            track,
+                            samples,
+                            0,
+                            initialLength,
+                            startGain,
+                            endGain);
                     if (!isCurrent(session)) {
                         return;
                     }
@@ -269,10 +304,17 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                                     + " after_request_ms="
                                     + elapsedSince(session.requestedAtMillis));
                     postIfCurrent(session, listener::onStarted);
-                    streamSamples(session, track, samples, initialLength);
+                    streamSamples(
+                            session,
+                            track,
+                            samples,
+                            initialLength,
+                            endGain,
+                            endGain);
                 } else {
-                    streamSamples(session, track, samples, 0);
+                    streamSamples(session, track, samples, 0, startGain, endGain);
                 }
+                session.previousGain = endGain;
             }
 
             if (!isCurrent(session)) {
@@ -326,7 +368,10 @@ public final class OfflineTtsPlayer implements AutoCloseable {
             PlaybackSession session,
             AudioTrack track,
             float[] samples,
-            int startOffset) {
+            int startOffset,
+            float startGain,
+            float endGain) {
+        boolean firstFrame = true;
         for (int offset = startOffset;
              offset < samples.length;
              offset += session.samplesPerFrame) {
@@ -334,7 +379,15 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 return;
             }
             int length = Math.min(session.samplesPerFrame, samples.length - offset);
-            writeFrame(session, track, samples, offset, length);
+            writeFrame(
+                    session,
+                    track,
+                    samples,
+                    offset,
+                    length,
+                    firstFrame ? startGain : endGain,
+                    endGain);
+            firstFrame = false;
         }
     }
 
@@ -343,13 +396,26 @@ public final class OfflineTtsPlayer implements AutoCloseable {
             AudioTrack track,
             float[] samples,
             int offset,
-            int length) {
+            int length,
+            float startGain,
+            float endGain) {
         MouthShape shape = AudioEnergyMouthMapper.shapeFor(samples, offset, length);
         if (shape != session.lastShape) {
             session.lastShape = shape;
             postIfCurrent(session, () -> listener.onMouthShape(shape));
         }
-        int written = track.write(samples, offset, length, AudioTrack.WRITE_BLOCKING);
+        PcmLoudnessNormalizer.copyWithGain(
+                samples,
+                offset,
+                length,
+                startGain,
+                endGain,
+                session.outputFrame);
+        int written = track.write(
+                session.outputFrame,
+                0,
+                length,
+                AudioTrack.WRITE_BLOCKING);
         if (written < 0) {
             throw new IllegalStateException("AudioTrack 写入失败：" + written);
         }
@@ -540,6 +606,10 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 generationMillis / (double) audioMillis);
     }
 
+    private static String formatDb(float value) {
+        return String.format(java.util.Locale.US, "%.2f", value);
+    }
+
     private static int countPunctuation(String text) {
         int count = 0;
         for (int index = 0; index < text.length(); index++) {
@@ -626,14 +696,17 @@ public final class OfflineTtsPlayer implements AutoCloseable {
         private final int speakerId;
         private final float speed;
         private final float silenceScale;
+        private final float targetRmsDbfs;
         private final int sampleRate;
         private final int samplesPerFrame;
         private final long requestedAtMillis;
         private final PcmChunkQueue queue = new PcmChunkQueue(PCM_QUEUE_CAPACITY);
         private final AtomicInteger enqueuedSamples = new AtomicInteger();
         private final AtomicInteger writtenSamples = new AtomicInteger();
+        private final float[] outputFrame;
         private volatile String failureMessage;
         private volatile MouthShape lastShape;
+        private float previousGain = Float.NaN;
 
         private PlaybackSession(
                 int generation,
@@ -641,6 +714,7 @@ public final class OfflineTtsPlayer implements AutoCloseable {
                 int speakerId,
                 float speed,
                 float silenceScale,
+                float targetRmsDbfs,
                 int sampleRate,
                 long requestedAtMillis) {
             this.generation = generation;
@@ -648,10 +722,12 @@ public final class OfflineTtsPlayer implements AutoCloseable {
             this.speakerId = speakerId;
             this.speed = speed;
             this.silenceScale = silenceScale;
+            this.targetRmsDbfs = targetRmsDbfs;
             this.sampleRate = sampleRate;
             this.samplesPerFrame = Math.max(
                     1,
                     sampleRate * FRAME_DURATION_MILLIS / 1000);
+            this.outputFrame = new float[samplesPerFrame];
             this.requestedAtMillis = requestedAtMillis;
         }
 

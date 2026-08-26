@@ -14,6 +14,7 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.huimei.voice.tts.TtsPause;
+import com.huimei.voice.tts.TtsVolume;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,13 +55,7 @@ public final class ArbitraryTtsActivityTest {
                     0,
                     TtsPause.LONG,
                     "chinese_pause_long");
-            speakAndWait(
-                    scenario,
-                    "氧气机运行正常，请注意用氧安全。",
-                    1,
-                    TtsPause.NATURAL,
-                    "chinese_voice_02");
-            for (int voiceIndex = 2; voiceIndex < 10; voiceIndex++) {
+            for (int voiceIndex = 0; voiceIndex < 10; voiceIndex++) {
                 speakAndWait(
                         scenario,
                         "潓美医疗，设备运行正常。",
@@ -127,6 +122,8 @@ public final class ArbitraryTtsActivityTest {
             voice.setSelection(voiceIndex);
             Spinner pauseSpinner = activity.findViewById(R.id.tts_pause_spinner);
             pauseSpinner.setSelection(pause.ordinal());
+            Spinner volumeSpinner = activity.findViewById(R.id.tts_volume_spinner);
+            volumeSpinner.setSelection(TtsVolume.ENHANCED.ordinal());
             EditText input = activity.findViewById(R.id.tts_text_input);
             input.setText(text);
             Button play = activity.findViewById(R.id.tts_play_button);

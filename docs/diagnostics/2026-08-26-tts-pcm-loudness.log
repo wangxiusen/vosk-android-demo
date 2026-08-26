@@ -1,0 +1,39 @@
+Device: Xiaomi 2201122C / Android 15 / arm64-v8a
+Date: 2026-08-26
+Mode: ENHANCED / target active RMS -18 dBFS
+Chinese test text: 潓美医疗，设备运行正常。
+
+speaker=4   input_active_rms_dbfs=-34.66 gain_db=16.66 output_active_rms_dbfs=-18.00 output_peak_dbfs=-3.67 analysis_ms=13
+speaker=122 input_active_rms_dbfs=-28.97 gain_db=10.97 output_active_rms_dbfs=-18.00 output_peak_dbfs=-4.90 analysis_ms=8
+speaker=0   input_active_rms_dbfs=-26.64 gain_db=8.64  output_active_rms_dbfs=-18.00 output_peak_dbfs=-4.25 analysis_ms=11
+speaker=1   input_active_rms_dbfs=-25.66 gain_db=7.66  output_active_rms_dbfs=-18.00 output_peak_dbfs=-3.27 analysis_ms=7
+speaker=16  input_active_rms_dbfs=-25.73 gain_db=7.73  output_active_rms_dbfs=-18.00 output_peak_dbfs=-4.47 analysis_ms=2
+speaker=19  input_active_rms_dbfs=-34.82 gain_db=16.82 output_active_rms_dbfs=-18.00 output_peak_dbfs=-6.52 analysis_ms=8
+speaker=57  input_active_rms_dbfs=-29.39 gain_db=11.39 output_active_rms_dbfs=-18.00 output_peak_dbfs=-7.16 analysis_ms=8
+speaker=104 input_active_rms_dbfs=-26.68 gain_db=8.68  output_active_rms_dbfs=-18.00 output_peak_dbfs=-6.31 analysis_ms=9
+speaker=113 input_active_rms_dbfs=-29.47 gain_db=11.47 output_active_rms_dbfs=-18.00 output_peak_dbfs=-5.41 analysis_ms=8
+speaker=147 input_active_rms_dbfs=-26.05 gain_db=8.05  output_active_rms_dbfs=-18.00 output_peak_dbfs=-3.60 analysis_ms=8
+
+Chinese main-block output RMS spread: 0.00 dB
+Chinese closest-to-full-scale output peak: -3.27 dBFS
+Chinese first_pcm_written after_request_ms: 195, 214, 267, 148, 140, 172, 168, 166, 202, 158
+
+English first blocks:
+pause=short   output_active_rms_dbfs=-18.00 output_peak_dbfs=-2.37 analysis_ms=4 first_pcm_written_ms=252
+pause=natural output_active_rms_dbfs=-18.00 output_peak_dbfs=-2.65 analysis_ms=20 first_pcm_written_ms=288
+pause=long    output_active_rms_dbfs=-18.00 output_peak_dbfs=-1.97 analysis_ms=4 first_pcm_written_ms=260
+
+Peak limiting examples on later English chunks:
+output_active_rms_dbfs=-18.62 output_peak_dbfs=-1.00 peak_limited=true
+output_active_rms_dbfs=-18.68 output_peak_dbfs=-1.00 peak_limited=true
+
+Cold first Chinese block: analysis_ms=64 first_pcm_written_ms=629
+Subsequent queue waits: 0-1 ms
+Ready PSS: Chinese 305645 kB; English 344095 kB
+
+Final verification:
+testDebugUnitTest: PASS
+lintDebug: PASS
+assembleDebug: PASS
+connectedDebugAndroidTest: 4/4 PASS
+Gradle: BUILD SUCCESSFUL in 1m 49s

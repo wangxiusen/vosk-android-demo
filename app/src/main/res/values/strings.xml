@@ -48,13 +48,14 @@
     <string name="tts_voice_label">女声音色</string>
     <string name="tts_speed_label">语速</string>
     <string name="tts_pause_label">标点停顿</string>
+    <string name="tts_volume_label">口播音量</string>
     <string name="tts_text_label">口播文字</string>
     <string name="tts_play">开始口播</string>
     <string name="tts_stop">停止</string>
     <string name="tts_status_loading">状态：正在初始化离线 TTS 模型…</string>
     <string name="tts_status_switching">状态：正在加载%1$s女声模型…</string>
     <string name="tts_status_ready">状态：模型已就绪（%1$d 个可用声音）</string>
-    <string name="tts_status_playing">状态：正在使用%1$s、%2$s、%3$s口播</string>
+    <string name="tts_status_playing">状态：正在使用%1$s、%2$s、%3$s、%4$s口播</string>
     <string name="tts_status_stopped">状态：口播已停止</string>
     <string name="tts_status_completed">状态：口播完成</string>
     <string name="tts_status_error">状态：%1$s</string>
