@@ -4,6 +4,7 @@
 /build
 /app/build
 /models/build
+/.worktrees
 .DS_Store
 *.md5
 *.lst
