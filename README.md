@@ -1,6 +1,6 @@
 # 潓美医疗 Vosk 离线语音 Demo
 
-这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动，以及任意文字离线口播四个 Demo，均完全离线运行。
+这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动、任意文字离线口播，以及 Sherpa/Vosk 两套离线声纹 Demo。声纹功能为本项目自行实现，没有复制两个 SDK 的官方 Demo 代码。
 
 ## 功能
 
@@ -16,6 +16,8 @@
 - 任意文字口播页使用 sherpa-onnx 和分语言 VITS 模型：中文 AISHELL3 提供 10 种已核对并完成真机合成的女声（北方、南方各 5 种），英文使用 Piper LJSpeech 女声；可切换 0.8/1.0/1.2 三档语速、0.5×/1.0×/1.5× 三档标点停顿和标准/增强/强三档口播音量（默认增强），并按原始 PCM 能量实时驱动四个嘴型。
 - TTS 播放前会按有效 RMS 自动增益，最大增益 `+18 dB`，输出峰值限制在 `-1 dBFS`；该处理不修改系统媒体音量。
 - 中英文 TTS 模型按当前语言切换，内存中只保留一套；生成回调只把 PCM 放入有界队列，播放线程独立消费，避免标点分句时的数秒断口。
+- 新增 Sherpa CAM++ 与 Vosk x-vector 两套离线声纹页面，共用相同的 16 kHz PCM16 录音、3 条录入样本、音频质量检查、1:1 验证和 1:N 识别流程。
+- 声纹 WAV、人员资料和分引擎特征仅保存到应用私有目录，支持删除单人或清空全部资料。
 
 ## 命令
 
@@ -72,6 +74,22 @@ app/build/outputs/apk/debug/app-debug.apk
 - `LightweightTtsConfigFactory`：配置中文 AISHELL3 和英文 Piper LJSpeech VITS 模型。
 - `OfflineTtsPlayer`：按语言加载模型，将流式生成与 `AudioTrack` 播放解耦。
 - `LottieAvatarMotionController`：控制待命位置及闭口、小口、中口、大口四个嘴型。
+- `BaseVoiceprintActivity`：两套声纹页面的共享 UI、权限、状态、指标和生命周期。
+- `voiceprint/VoiceprintController`：串行化模型加载、录音、录入、1:1/1:N 与过期回调防护。
+- `voiceprint/SherpaVoiceprintEngine`：CAM++ 192 维声纹提取。
+- `voiceprint/VoskVoiceprintEngine`：Vosk SpeakerModel 128 维声纹提取。
+
+## 声纹 Demo
+
+固定录入短语为：
+
+```text
+潓美医疗声纹测试，一二三四五六七八九十，现在开始识别我的声音。
+```
+
+每人录入 3 条、每条 5 秒。当前阈值仅是 Demo 初值，不具备录音回放防护，不能直接用作医疗设备生产级身份认证。真机性能、已验证范围和待测项目见 [docs/voiceprint-comparison.md](docs/voiceprint-comparison.md)。
+
+人脸识别的首期选型与分阶段实施建议见 [docs/face-recognition-research.md](docs/face-recognition-research.md)；当前 APK 还未编码该功能。
 
 ## 中文模型词表说明
 

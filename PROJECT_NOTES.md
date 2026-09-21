@@ -1,8 +1,8 @@
 # 潓美医疗离线语音 Demo：功能与工程知识记录
 
-> 更新日期：2026-08-26
+> 更新日期：2026-09-21
 >
-> 当前分支：`feat/huimei-voice-demo`
+> 当前分支：`feat/dual-voiceprint-demo`
 >
 > 应用包名：`com.huimei.voice`
 
@@ -22,6 +22,7 @@
 - Android 原生 `MediaPlayer` 播放离线 MP3，不依赖 TTS SDK。
 - Lottie Android 6.7.1 播放离线医疗助手 V5 JSON。
 - sherpa-onnx 1.13.6 + 中文 AISHELL3 VITS + 英文 Piper LJSpeech VITS 提供任意文字离线 TTS。
+- sherpa-onnx CAM++ 与 Vosk `SpeakerModel` 提供两套自行实现的离线声纹对比 Demo。
 - TTS 切换语言时释放旧模型，仅当前语言模型常驻；生成回调与 `AudioTrack` 播放通过有界 PCM 队列解耦。
 - 当前模型、Vosk、JNA及工程代码所使用的许可证信息见 `THIRD_PARTY_NOTICES.md`。
 
@@ -90,6 +91,7 @@ docs/      已确认的设计文档和实施计划
 - “医疗助手 Lottie V5 Demo”从应用 Assets 离线加载动画，支持循环播放、暂停和重播。
 - “语音 + 医疗助手动画 Demo”复用原有中英文识别和提示音逻辑。待命时人物居中、闭口并仅保留眼睛活动；提示音播放期间恢复 V5 口型，结束或失败后自动恢复待命。
 - “任意文字口播动画 Demo”支持中英文文本、10 种中文女声音色、1 种英文女声、0.8/1.0/1.2 三档语速、短/标准/长三档标点停顿和标准/增强/强三档口播音量；中文音色按北方、南方各 5 种展示。停顿倍率分别为 0.5×、1.0×、1.5×，默认标准档。TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
+- “Sherpa 离线声纹 Demo”与“Vosk 离线声纹 Demo”共用三条录入样本、录音质量门、私有目录持久化和余弦匹配逻辑，可单独做 1:1 验证或 1:N 识别。页面显示模型加载、推理、PSS、分数、阈值和事件日志。
 
 TTS PCM 已在写入 `AudioTrack` 前执行响度一致化：有效样本阈值 `-45 dBFS`，最大增益 `+18 dB`，峰值上限 `-1 dBFS`；标准/增强/强三档目标分别为 `-20/-18/-16 dBFS`，默认增强。嘴型仍使用未增益的原始 PCM，不会因音量放大而长期保持大口。方案、已测结果和冷启动耗时边界见 `docs/diagnostics/2026-08-26-tts-pcm-loudness-plan.md`。
 
@@ -148,6 +150,11 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 | `app/src/main/java/com/huimei/voice/audio/VoicePromptCatalog.java` | 语言、事件到 raw 音频资源的映射 |
 | `app/src/main/java/com/huimei/voice/audio/VoicePromptPlayer.java` | 单实例 `MediaPlayer` 播放和释放 |
 | `app/src/main/java/com/huimei/voice/ui/EventLogFormatter.java` | UI事件与诊断日志格式化 |
+| `app/src/main/java/com/huimei/voice/BaseVoiceprintActivity.java` | 两套声纹页面的共享 Java/XML UI 和生命周期 |
+| `app/src/main/java/com/huimei/voice/voiceprint/VoiceprintController.java` | 声纹模型、录音、录入、验证、识别的串行化编排 |
+| `app/src/main/java/com/huimei/voice/voiceprint/VoiceprintRepository.java` | 应用私有声纹样本、资料和分引擎特征持久化 |
+| `app/src/main/java/com/huimei/voice/voiceprint/SherpaVoiceprintEngine.java` | Sherpa CAM++ 192 维特征适配器 |
+| `app/src/main/java/com/huimei/voice/voiceprint/VoskVoiceprintEngine.java` | Vosk x-vector 128 维特征适配器 |
 
 ## 4. 模型存放、切换和加载
 
@@ -277,14 +284,16 @@ app/build/outputs/apk/debug/app-debug.apk
 
 截至本文记录时，最近一次完整验证结果为：
 
-- Gradle构建成功。
-- 20个JVM单元测试通过。
-- Debug APK约98 MB。
+- `clean :app:testDebugUnitTest :app:assembleDebug` 构建成功。
+- 83 个 JVM 单元测试通过，0 失败，0 跳过。
+- 3 个声纹真机界面/生命周期自动测试通过。
+- Debug APK 为 290,562,698 bytes（约 277 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3 和两套声纹模型。
+- Huawei HMA-AL00（Android 10）上 Sherpa 与 Vosk 声纹模型均进入就绪，冷加载分别为 568 ms 和 563 ms。
 - 中文模型目录约65 MB。
 - 英文模型目录约68 MB。
-- 华为 Android 12 真机完成中文和英文识别验证。
-- 已验证中文、英文唤醒以及1小时、8小时产气提示音触发。
-- 英文真机日志确认识别 `Hello Medical` 和 `eight hours gas production`，并触发 `GAS_8_HOURS`。
+- 历史语音验收已验证中文、英文唤醒以及 1 小时、8 小时产气提示音触发；英文日志确认过 `Hello Medical` 和 `eight hours gas production` -> `GAS_8_HOURS`。
+
+声纹性能数据、已验证范围和未完成的真人阈值测试见 `docs/voiceprint-comparison.md`。
 
 这些结果是历史验收记录，不代表以后修改代码、模型、音频或目标硬件后仍自动成立。每次发布都应重新构建并在目标工业机上完成真机验收。
 
