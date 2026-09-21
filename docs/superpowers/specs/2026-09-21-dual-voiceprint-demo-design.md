@@ -120,12 +120,12 @@ files/voiceprint/
 
 ## 模型交付
 
-两个声纹模型随 Demo APK 放入 assets，首次使用时复制到应用私有模型目录：
+两个声纹模型随 Demo APK 放入 assets：
 
 - Sherpa CAM++：约 27 MiB。
 - Vosk speaker model：约 13 MiB。
 
-Vosk 中文 ASR 模型复用现有 `models` 模块，不重复打包。工业 Pad 版本后续可增加 `arm64-v8a` 专用构建以减少多 ABI 原生库体积，但首版不改变现有 ABI 配置。
+Sherpa Java API 通过 `AssetManager` 直接加载 ONNX，不额外复制模型。Vosk `SpeakerModel` 只接受文件系统目录，因此首次使用时把 speaker model 和现有 `model-cn` 复制到应用私有模型目录；中文 ASR 模型仍复用现有 `models` 模块资产，不重复打包。工业 Pad 版本后续可增加 `arm64-v8a` 专用构建以减少多 ABI 原生库体积，但首版不改变现有 ABI 配置。
 
 每个模型必须在 `THIRD_PARTY_NOTICES.md` 中记录来源、版本、下载地址、文件哈希和许可证。代码仓库许可证不能替代具体模型资产的许可证核对。
 
