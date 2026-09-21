@@ -39,9 +39,10 @@ CameraX 分析采用 RGBA 输出与 `STRATEGY_KEEP_ONLY_LATEST`，避免分析�
 ### 模型与帧分析
 
 - `FaceModelInstaller`：按固定清单复制并校验两个 ONNX assets。
-- `OpenCvFaceEngine`：封装 YuNet/SFace，输入已校正方向的 RGBA `Mat`，输出人脸数量、质量、128 维归一化特征和可保存的对齐头像。
+- `FaceFrame` / `FaceEngine`：用不可变 RGBA 帧和小接口隔离 CameraX、控制器与 OpenCV，控制器可以用假引擎做 JVM 测试。
+- `OpenCvFaceEngine`：封装 YuNet/SFace，输入已校正方向的 RGBA `FaceFrame`，输出人脸数量、质量、128 维归一化特征和可保存的对齐头像。
 - `FaceFrameQuality`：检查检测置信度、人脸相对尺寸、亮度和 Laplacian 清晰度；具体阈值作为 Demo 起点写入常量并展示在文档中。
-- `RgbaFrameConverter`：从 CameraX RGBA plane 复制到 OpenCV Mat，并按 `rotationDegrees` 旋转；不持有 `ImageProxy`。
+- `RgbaFrameConverter`：从 CameraX RGBA plane 复制并按 `rotationDegrees` 旋转为紧凑的不可变 `FaceFrame`；不持有 `ImageProxy`。
 
 ### 编排与界面
 
