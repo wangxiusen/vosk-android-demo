@@ -1,6 +1,6 @@
 # 潓美医疗 Vosk 离线语音 Demo
 
-这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动、任意文字离线口播，以及 Sherpa/Vosk 两套离线声纹 Demo。声纹功能为本项目自行实现，没有复制两个 SDK 的官方 Demo 代码。
+这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动、任意文字离线口播、Sherpa/Vosk 两套离线声纹，以及 OpenCV 离线人脸识别 Demo。声纹和人脸业务流程均为本项目自行实现。
 
 ## 功能
 
@@ -18,6 +18,8 @@
 - 中英文 TTS 模型按当前语言切换，内存中只保留一套；生成回调只把 PCM 放入有界队列，播放线程独立消费，避免标点分句时的数秒断口。
 - 新增 Sherpa CAM++ 与 Vosk x-vector 两套离线声纹页面，共用相同的 16 kHz PCM16 录音、3 条录入样本、音频质量检查、1:1 验证和 1:N 识别流程。
 - 声纹 WAV、人员资料和分引擎特征仅保存到应用私有目录，支持删除单人或清空全部资料。
+- 新增 CameraX + OpenCV YuNet/SFace 离线人脸 Demo：每人自动采集 5 帧合格人脸，实时 1:N 识别需连续 3 帧同一候选才确认。
+- 人脸照片、元数据和 128 维特征仅保存在应用私有目录，不上传网络；支持删除单人或清空全部资料。
 
 ## 命令
 
@@ -78,6 +80,10 @@ app/build/outputs/apk/debug/app-debug.apk
 - `voiceprint/VoiceprintController`：串行化模型加载、录音、录入、1:1/1:N 与过期回调防护。
 - `voiceprint/SherpaVoiceprintEngine`：CAM++ 192 维声纹提取。
 - `voiceprint/VoskVoiceprintEngine`：Vosk SpeakerModel 128 维声纹提取。
+- `FaceRecognitionActivity`：摄像头权限、CameraX 预览/分析、录入与识别 UI。
+- `face/OpenCvFaceEngine`：YuNet 检测、质量门、SFace 对齐与 128 维特征提取。
+- `face/FaceRecognitionController`：五帧录入、有界帧处理、三帧稳定确认与生命周期管理。
+- `face/FaceRepository`：应用私有目录的人脸资料、照片和特征持久化。
 
 ## 声纹 Demo
 
@@ -89,7 +95,11 @@ app/build/outputs/apk/debug/app-debug.apk
 
 每人录入 3 条、每条 5 秒。当前阈值仅是 Demo 初值，不具备录音回放防护，不能直接用作医疗设备生产级身份认证。真机性能、已验证范围和待测项目见 [docs/voiceprint-comparison.md](docs/voiceprint-comparison.md)。
 
-人脸识别的首期选型与分阶段实施建议见 [docs/face-recognition-research.md](docs/face-recognition-research.md)；当前 APK 还未编码该功能。
+## 人脸识别 Demo
+
+首次进入页面后点击“授权摄像头”。输入姓名并点击“开始录入”，页面会在只有一张人脸且亮度、清晰度、大小达标时自动收集 5 帧。“开始识别”进行本地 1:N 比对，连续 3 帧同一候选达标后才显示通过。
+
+当前余弦阈值 `0.363` 只是 OpenCV 示例起点，没有经过目标人群和工业环境标定；当前也没有活体检测。不能把该 Demo 单独用于制氧机启停、治疗参数或其他安全关键操作。方案与待标定项见 [人脸识别调研](docs/face-recognition-research.md)，当前验证证据见 [人脸识别验证记录](docs/face-recognition-verification.md)。
 
 ## 中文模型词表说明
 

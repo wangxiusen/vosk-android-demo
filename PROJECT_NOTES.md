@@ -2,7 +2,7 @@
 
 > 更新日期：2026-09-21
 >
-> 当前分支：`feat/dual-voiceprint-demo`
+> 当前分支：`feat/face-recognition-demo`
 >
 > 应用包名：`com.huimei.voice`
 
@@ -23,6 +23,7 @@
 - Lottie Android 6.7.1 播放离线医疗助手 V5 JSON。
 - sherpa-onnx 1.13.6 + 中文 AISHELL3 VITS + 英文 Piper LJSpeech VITS 提供任意文字离线 TTS。
 - sherpa-onnx CAM++ 与 Vosk `SpeakerModel` 提供两套自行实现的离线声纹对比 Demo。
+- CameraX 1.4.2 + OpenCV 4.13.0 + YuNet/SFace INT8 提供全离线人脸录入与 1:N 识别 Demo。
 - TTS 切换语言时释放旧模型，仅当前语言模型常驻；生成回调与 `AudioTrack` 播放通过有界 PCM 队列解耦。
 - 当前模型、Vosk、JNA及工程代码所使用的许可证信息见 `THIRD_PARTY_NOTICES.md`。
 
@@ -92,6 +93,7 @@ docs/      已确认的设计文档和实施计划
 - “语音 + 医疗助手动画 Demo”复用原有中英文识别和提示音逻辑。待命时人物居中、闭口并仅保留眼睛活动；提示音播放期间恢复 V5 口型，结束或失败后自动恢复待命。
 - “任意文字口播动画 Demo”支持中英文文本、10 种中文女声音色、1 种英文女声、0.8/1.0/1.2 三档语速、短/标准/长三档标点停顿和标准/增强/强三档口播音量；中文音色按北方、南方各 5 种展示。停顿倍率分别为 0.5×、1.0×、1.5×，默认标准档。TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
 - “Sherpa 离线声纹 Demo”与“Vosk 离线声纹 Demo”共用三条录入样本、录音质量门、私有目录持久化和余弦匹配逻辑，可单独做 1:1 验证或 1:N 识别。页面显示模型加载、推理、PSS、分数、阈值和事件日志。
+- “离线人脸识别 Demo”前置摄像头优先、后置回退，自动采集 5 帧合格人脸并平均归一化特征；实时识别采用最新帧丢弃策略，同一候选连续 3 帧通过才确认。页面显示画面质量、模型加载、推理、PSS 和事件日志。
 
 TTS PCM 已在写入 `AudioTrack` 前执行响度一致化：有效样本阈值 `-45 dBFS`，最大增益 `+18 dB`，峰值上限 `-1 dBFS`；标准/增强/强三档目标分别为 `-20/-18/-16 dBFS`，默认增强。嘴型仍使用未增益的原始 PCM，不会因音量放大而长期保持大口。方案、已测结果和冷启动耗时边界见 `docs/diagnostics/2026-08-26-tts-pcm-loudness-plan.md`。
 
@@ -155,6 +157,10 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 | `app/src/main/java/com/huimei/voice/voiceprint/VoiceprintRepository.java` | 应用私有声纹样本、资料和分引擎特征持久化 |
 | `app/src/main/java/com/huimei/voice/voiceprint/SherpaVoiceprintEngine.java` | Sherpa CAM++ 192 维特征适配器 |
 | `app/src/main/java/com/huimei/voice/voiceprint/VoskVoiceprintEngine.java` | Vosk x-vector 128 维特征适配器 |
+| `app/src/main/java/com/huimei/voice/FaceRecognitionActivity.java` | CameraX 权限、预览、RGBA 分析和人脸交互页面 |
+| `app/src/main/java/com/huimei/voice/face/OpenCvFaceEngine.java` | YuNet 检测、质量门、SFace 对齐和 128 维特征 |
+| `app/src/main/java/com/huimei/voice/face/FaceRecognitionController.java` | 录入、识别、限流、稳定确认和过期回调防护 |
+| `app/src/main/java/com/huimei/voice/face/FaceRepository.java` | 私有目录的照片、特征和人员元数据持久化 |
 
 ## 4. 模型存放、切换和加载
 
@@ -285,15 +291,17 @@ app/build/outputs/apk/debug/app-debug.apk
 截至本文记录时，最近一次完整验证结果为：
 
 - `clean :app:testDebugUnitTest :app:assembleDebug` 构建成功。
-- 86 个 JVM 单元测试通过，0 失败，0 跳过。
+- 116 个 JVM 单元测试通过，0 失败，0 跳过。
 - 3 个声纹真机界面/生命周期自动测试通过。
-- Debug APK 为 290,632,550 bytes（约 277 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3 和两套声纹模型。
+- Debug APK 为 348,119,217 bytes（约 332 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3、两套声纹模型、OpenCV 三个 ABI 原生库和两个人脸模型。
 - Huawei HMA-AL00（Android 10）上 Sherpa 与 Vosk 声纹模型均进入就绪，冷加载分别为 568 ms 和 563 ms。
 - 中文模型目录约65 MB。
 - 英文模型目录约68 MB。
 - 历史语音验收已验证中文、英文唤醒以及 1 小时、8 小时产气提示音触发；英文日志确认过 `Hello Medical` 和 `eight hours gas production` -> `GAS_8_HOURS`。
 
 声纹性能数据、已验证范围和未完成的真人阈值测试见 `docs/voiceprint-comparison.md`。
+
+人脸 Demo 的纯逻辑、干净构建和 APK 打包已验证；本次验收时 ADB 无在线设备，所以目标工业 Pad 的摄像头预览、真人录入/匹配、推理耗时与 PSS 均明确标记为未验证，详见 `docs/face-recognition-verification.md`。
 
 Vosk 声纹提取不能只读取 `getFinalResult()`：一句话先触发端点、录音尾部又包含静音时，有效的 `spk`/`spk_frames` 会位于此前的 `getResult()`。当前适配器保存全部端点结果并选择帧数最多的有效声纹向量，最低帧数与 Vosk 原生实现保持为 50。
 

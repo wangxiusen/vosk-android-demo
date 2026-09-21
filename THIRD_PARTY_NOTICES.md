@@ -78,3 +78,35 @@ The English model files inherited from the upstream Android demo were compared w
 - Bundled `en_US-ljspeech-medium.onnx` SHA-256: `8ceba58a4b540d4e7e7e24ad079cf0d92762a4fd334e059f12940787c6c37b3d`
 - Voice repository license: MIT
 - Dataset: LJSpeech, public domain
+
+## AndroidX CameraX
+
+- Artifacts: `androidx.camera:camera-camera2:1.4.2`, `camera-lifecycle:1.4.2`, `camera-view:1.4.2`
+- Source: https://github.com/androidx/androidx/tree/androidx-main/camera
+- License: Apache License 2.0
+
+CameraX 1.4.2 is intentionally pinned so this Demo can retain its existing Android API 21 minimum.
+
+## OpenCV Android
+
+- Artifact: `org.opencv:opencv:4.13.0`
+- Source: https://github.com/opencv/opencv
+- License: Apache License 2.0
+
+## YuNet face detector
+
+- Model: `face_detection_yunet_2023mar.onnx`
+- Source: https://github.com/opencv/opencv_zoo/tree/main/models/face_detection_yunet
+- Bundled size: `232589` bytes
+- Bundled SHA-256: `8f2383e4dd3cfbb4553ea8718107fc0423210dc964f9f4280604804ed2552fa4`
+- License listed in the model directory: MIT
+
+## SFace face recognizer
+
+- Model: `face_recognition_sface_2021dec_int8.onnx`
+- Source: https://github.com/opencv/opencv_zoo/tree/main/models/face_recognition_sface
+- Bundled size: `9896933` bytes
+- Bundled SHA-256: `2b0e941e6f16cc048c20aee0c8e31f569118f65d702914540f7bfdc14048d78a`
+- License listed in the model directory: Apache License 2.0
+
+The repository license does not replace a product-specific legal review of the SFace training-data provenance or the collection, consent, retention and deletion rules for biometric data. Complete that review before medical or commercial production use.
