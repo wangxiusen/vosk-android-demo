@@ -3,6 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -12,6 +17,9 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:theme="@style/Theme.HuimeiVoice"
         tools:targetApi="s">
+        <activity
+            android:name=".FaceRecognitionActivity"
+            android:exported="false" />
         <activity
             android:name=".VoskVoiceprintActivity"
             android:exported="false" />

@@ -26,7 +26,11 @@ public enum DemoDestination {
     VOSK_VOICEPRINT(
             R.string.demo_vosk_voiceprint_title,
             R.string.demo_vosk_voiceprint_summary,
-            VoskVoiceprintActivity.class);
+            VoskVoiceprintActivity.class),
+    FACE_RECOGNITION(
+            R.string.demo_face_title,
+            R.string.demo_face_summary,
+            FaceRecognitionActivity.class);
 
     private final int titleResourceId;
     private final int summaryResourceId;

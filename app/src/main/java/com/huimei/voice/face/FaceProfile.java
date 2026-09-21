@@ -62,4 +62,9 @@ public final class FaceProfile {
     public int hashCode() {
         return Objects.hash(id, displayName, sampleCount, createdAtMillis);
     }
+
+    @Override
+    public String toString() {
+        return displayName;
+    }
 }
