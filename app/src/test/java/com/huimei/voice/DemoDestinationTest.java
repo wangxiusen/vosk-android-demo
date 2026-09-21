@@ -34,12 +34,16 @@ public final class DemoDestinationTest {
                         "VOICE_RECOGNITION",
                         "LOTTIE_AVATAR",
                         "VOICE_AVATAR",
-                        "ARBITRARY_TTS_AVATAR"
+                        "ARBITRARY_TTS_AVATAR",
+                        "SHERPA_VOICEPRINT",
+                        "VOSK_VOICEPRINT"
                 },
                 names);
         assertEquals("com.huimei.voice.VoiceRecognitionActivity", activityClassNames[0]);
         assertEquals("com.huimei.voice.LottieDemoActivity", activityClassNames[1]);
         assertEquals("com.huimei.voice.VoiceAvatarActivity", activityClassNames[2]);
         assertEquals("com.huimei.voice.ArbitraryTtsActivity", activityClassNames[3]);
+        assertEquals("com.huimei.voice.SherpaVoiceprintActivity", activityClassNames[4]);
+        assertEquals("com.huimei.voice.VoskVoiceprintActivity", activityClassNames[5]);
     }
 }

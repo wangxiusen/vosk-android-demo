@@ -18,7 +18,15 @@ public enum DemoDestination {
     ARBITRARY_TTS_AVATAR(
             R.string.demo_tts_avatar_title,
             R.string.demo_tts_avatar_summary,
-            ArbitraryTtsActivity.class);
+            ArbitraryTtsActivity.class),
+    SHERPA_VOICEPRINT(
+            R.string.demo_sherpa_voiceprint_title,
+            R.string.demo_sherpa_voiceprint_summary,
+            SherpaVoiceprintActivity.class),
+    VOSK_VOICEPRINT(
+            R.string.demo_vosk_voiceprint_title,
+            R.string.demo_vosk_voiceprint_summary,
+            VoskVoiceprintActivity.class);
 
     private final int titleResourceId;
     private final int summaryResourceId;

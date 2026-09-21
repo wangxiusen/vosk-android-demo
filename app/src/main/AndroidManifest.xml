@@ -13,6 +13,12 @@
         android:theme="@style/Theme.HuimeiVoice"
         tools:targetApi="s">
         <activity
+            android:name=".VoskVoiceprintActivity"
+            android:exported="false" />
+        <activity
+            android:name=".SherpaVoiceprintActivity"
+            android:exported="false" />
+        <activity
             android:name=".ArbitraryTtsActivity"
             android:exported="false" />
         <activity
