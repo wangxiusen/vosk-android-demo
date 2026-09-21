@@ -7,12 +7,14 @@ import org.vosk.Recognizer;
 import org.vosk.SpeakerModel;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public final class VoskVoiceprintEngine implements VoiceprintEngine {
     private static final int MODEL_SAMPLE_RATE = 16000;
     private static final int EMBEDDING_DIMENSION = 128;
-    private static final int MINIMUM_SPEAKER_FRAMES = 200;
+    static final int MINIMUM_SPEAKER_FRAMES = 50;
     private static final int PCM_CHUNK_SAMPLES = 4096;
 
     private final VoiceprintModelInstaller installer;
@@ -78,13 +80,17 @@ public final class VoskVoiceprintEngine implements VoiceprintEngine {
 
         try (Recognizer recognizer = new Recognizer(
                 recognitionModel, MODEL_SAMPLE_RATE, speakerModel)) {
+            List<String> results = new ArrayList<>();
             for (int offset = 0; offset < pcm16.length; offset += PCM_CHUNK_SAMPLES) {
                 int end = Math.min(pcm16.length, offset + PCM_CHUNK_SAMPLES);
                 short[] chunk = Arrays.copyOfRange(pcm16, offset, end);
-                recognizer.acceptWaveForm(chunk, chunk.length);
+                if (recognizer.acceptWaveForm(chunk, chunk.length)) {
+                    results.add(recognizer.getResult());
+                }
             }
-            float[] embedding = VoskSpeakerVectorParser.parse(
-                    recognizer.getFinalResult(), MINIMUM_SPEAKER_FRAMES);
+            results.add(recognizer.getFinalResult());
+            float[] embedding = VoskSpeakerVectorParser.parseBest(
+                    results, MINIMUM_SPEAKER_FRAMES);
             if (embedding.length != EMBEDDING_DIMENSION) {
                 throw new IllegalStateException("Vosk returned an unexpected embedding dimension");
             }

@@ -5,6 +5,8 @@ import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
+import java.util.Arrays;
+
 public class VoskSpeakerVectorParserTest {
 
     @Test
@@ -43,5 +45,16 @@ public class VoskSpeakerVectorParserTest {
         assertThrows(IllegalArgumentException.class,
                 () -> VoskSpeakerVectorParser.parse(
                         "{\"spk\":[1.0],\"spk_frames\":240}", 0));
+    }
+
+    @Test
+    public void selectsEndpointSpeakerVectorWhenFinalSegmentIsOnlySilence() {
+        float[] value = VoskSpeakerVectorParser.parseBest(
+                Arrays.asList(
+                        "{\"spk\":[0.1,-0.2],\"spk_frames\":96}",
+                        "{\"text\":\"\"}"),
+                50);
+
+        assertArrayEquals(new float[]{0.1f, -0.2f}, value, 0.0001f);
     }
 }

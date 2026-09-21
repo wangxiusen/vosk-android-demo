@@ -41,4 +41,9 @@ public class VoiceprintEngineContractTest {
         assertEquals(3, constructor.getParameterCount());
         assertEquals(String.class, Recognizer.class.getMethod("getFinalResult").getReturnType());
     }
+
+    @Test
+    public void voskUsesTheNativeMinimumSpeakerFrameRequirement() {
+        assertEquals(50, VoskVoiceprintEngine.MINIMUM_SPEAKER_FRAMES);
+    }
 }

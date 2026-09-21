@@ -331,17 +331,34 @@ public abstract class BaseVoiceprintActivity extends AppCompatActivity
         VoiceprintController.State currentState = controller == null
                 ? VoiceprintController.State.NEW
                 : controller.getState();
+        boolean microphonePermission = hasMicrophonePermission();
         boolean ready = currentState == VoiceprintController.State.IDLE
-                && hasMicrophonePermission();
+                && microphonePermission;
         boolean hasProfiles = !profiles.isEmpty();
+        boolean profileActionsEnabled = profileActionsEnabled(
+                currentState,
+                microphonePermission,
+                hasProfiles,
+                acceptedEnrollmentSamples);
         recordButton.setEnabled(ready && acceptedEnrollmentSamples < 3);
         finishButton.setEnabled(ready && acceptedEnrollmentSamples == 3);
         nameInput.setEnabled(ready && acceptedEnrollmentSamples == 0);
-        profileSpinner.setEnabled(ready && hasProfiles);
-        identifyButton.setEnabled(ready && hasProfiles);
-        verifyButton.setEnabled(ready && hasProfiles);
-        deleteButton.setEnabled(ready && hasProfiles);
-        clearButton.setEnabled(ready && hasProfiles);
+        profileSpinner.setEnabled(profileActionsEnabled);
+        identifyButton.setEnabled(profileActionsEnabled);
+        verifyButton.setEnabled(profileActionsEnabled);
+        deleteButton.setEnabled(profileActionsEnabled);
+        clearButton.setEnabled(profileActionsEnabled);
+    }
+
+    static boolean profileActionsEnabled(
+            VoiceprintController.State state,
+            boolean microphonePermission,
+            boolean hasProfiles,
+            int acceptedEnrollmentSamples) {
+        return state == VoiceprintController.State.IDLE
+                && microphonePermission
+                && hasProfiles
+                && acceptedEnrollmentSamples == 0;
     }
 
     private void appendLog(String message) {

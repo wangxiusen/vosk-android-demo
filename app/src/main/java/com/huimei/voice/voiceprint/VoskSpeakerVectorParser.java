@@ -4,6 +4,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.List;
+
 public final class VoskSpeakerVectorParser {
     private VoskSpeakerVectorParser() {
     }
@@ -38,6 +40,49 @@ public final class VoskSpeakerVectorParser {
                 }
             }
             return vector;
+        } catch (JSONException exception) {
+            throw new IllegalArgumentException("Malformed Vosk speaker result", exception);
+        }
+    }
+
+    public static float[] parseBest(List<String> jsonResults, int minimumFrames) {
+        if (jsonResults == null || jsonResults.isEmpty()) {
+            throw new IllegalArgumentException("Vosk results are required");
+        }
+        if (minimumFrames <= 0) {
+            throw new IllegalArgumentException("Minimum speaker frame count must be positive");
+        }
+
+        float[] bestVector = null;
+        int bestFrameCount = -1;
+        for (String json : jsonResults) {
+            try {
+                int frameCount = speakerFrameCount(json);
+                float[] vector = parse(json, minimumFrames);
+                if (frameCount > bestFrameCount) {
+                    bestFrameCount = frameCount;
+                    bestVector = vector;
+                }
+            } catch (IllegalArgumentException ignored) {
+                // Endpoint and final results without a speaker vector are expected.
+            }
+        }
+        if (bestVector == null) {
+            throw new IllegalArgumentException("Vosk results have no usable speaker vector");
+        }
+        return bestVector;
+    }
+
+    private static int speakerFrameCount(String json) {
+        if (json == null || json.trim().isEmpty()) {
+            throw new IllegalArgumentException("Vosk result is required");
+        }
+        try {
+            Object value = new JSONObject(json).opt("spk_frames");
+            if (!(value instanceof Number)) {
+                throw new IllegalArgumentException("Vosk result has no speaker frames");
+            }
+            return ((Number) value).intValue();
         } catch (JSONException exception) {
             throw new IllegalArgumentException("Malformed Vosk speaker result", exception);
         }

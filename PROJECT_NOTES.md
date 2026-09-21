@@ -285,15 +285,17 @@ app/build/outputs/apk/debug/app-debug.apk
 截至本文记录时，最近一次完整验证结果为：
 
 - `clean :app:testDebugUnitTest :app:assembleDebug` 构建成功。
-- 83 个 JVM 单元测试通过，0 失败，0 跳过。
+- 86 个 JVM 单元测试通过，0 失败，0 跳过。
 - 3 个声纹真机界面/生命周期自动测试通过。
-- Debug APK 为 290,562,698 bytes（约 277 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3 和两套声纹模型。
+- Debug APK 为 290,632,550 bytes（约 277 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3 和两套声纹模型。
 - Huawei HMA-AL00（Android 10）上 Sherpa 与 Vosk 声纹模型均进入就绪，冷加载分别为 568 ms 和 563 ms。
 - 中文模型目录约65 MB。
 - 英文模型目录约68 MB。
 - 历史语音验收已验证中文、英文唤醒以及 1 小时、8 小时产气提示音触发；英文日志确认过 `Hello Medical` 和 `eight hours gas production` -> `GAS_8_HOURS`。
 
 声纹性能数据、已验证范围和未完成的真人阈值测试见 `docs/voiceprint-comparison.md`。
+
+Vosk 声纹提取不能只读取 `getFinalResult()`：一句话先触发端点、录音尾部又包含静音时，有效的 `spk`/`spk_frames` 会位于此前的 `getResult()`。当前适配器保存全部端点结果并选择帧数最多的有效声纹向量，最低帧数与 Vosk 原生实现保持为 50。
 
 这些结果是历史验收记录，不代表以后修改代码、模型、音频或目标硬件后仍自动成立。每次发布都应重新构建并在目标工业机上完成真机验收。
 
