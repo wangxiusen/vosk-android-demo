@@ -37,6 +37,29 @@ The English model files inherited from the upstream Android demo were compared w
 - Downloaded SHA-256: `0012d9a28f15bd6fb966b62b70a75da3990512fdccce28b83098248ce4be1698`
 - License: Apache License 2.0
 
+## 3D-Speaker CAM++ speaker-embedding model
+
+- Model: `speech_campplus_sv_zh-cn_16k-common` converted to ONNX and distributed by sherpa-onnx
+- Bundled file: `3dspeaker_speech_campplus_sv_zh-cn_16k-common.onnx`
+- Source model: https://www.modelscope.cn/models/iic/speech_campplus_sv_zh-cn_16k-common
+- ONNX download: https://github.com/k2-fsa/sherpa-onnx/releases/download/speaker-recongition-models/3dspeaker_speech_campplus_sv_zh-cn_16k-common.onnx
+- Bundled size: `28281138` bytes
+- Downloaded SHA-256: `f682b514c05d947ee3fa91cd6ec6c5c7543479a128373fa29b1faedccd21fd11`
+- License listed by the source model page: Apache License 2.0
+
+## Vosk speaker-identification model
+
+- Model: `vosk-model-spk-0.4`
+- Source: https://alphacephei.com/vosk/models/vosk-model-spk-0.4.zip
+- Downloaded archive size: `13869103` bytes
+- Downloaded archive SHA-256: `a74d8f51144484813e16af689bb0f916b7a111e2347f467c4933c1166097b5a7`
+- License listed by the Vosk model catalog: Apache License 2.0
+- Bundled files:
+  - `mfcc.conf`: `94` bytes, SHA-256 `86f4df625b950b81b68864fdefabf26aa65079f84ea20f40e7f9e7ccbb9c456c`
+  - `mean.vec`: `1199` bytes, SHA-256 `3bc5dfa9479c3aaacf4f45c155e9bd4772785449112566fac23578c09e93bcd7`
+  - `transform.mat`: `65551` bytes, SHA-256 `fab14481fb27c41df0f1825afe18530e4f6d128dbb2c239ee86d8d7096e22c33`
+  - `final.ext.raw`: `14929171` bytes, SHA-256 `d30354474ac719b3cfce58186463302b988cf22ce3afee7237a2da862c4a91d1`
+
 ## Chinese AISHELL3 VITS TTS model
 
 - Model: `vits-icefall-zh-aishell3`
