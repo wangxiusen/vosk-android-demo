@@ -75,6 +75,7 @@ public final class FaceRecognitionActivity extends AppCompatActivity
     private ExecutorService analysisExecutor;
     private ProcessCameraProvider cameraProvider;
     private boolean cameraBound;
+    private boolean cameraUnavailable;
     private boolean destroyed;
     private long modelLoadMillis;
 
@@ -154,7 +155,13 @@ public final class FaceRecognitionActivity extends AppCompatActivity
                 statusView.setText(R.string.face_status_loading);
                 break;
             case IDLE:
-                statusView.setText(R.string.face_status_ready);
+                if (cameraUnavailable) {
+                    statusView.setText(getString(
+                            R.string.face_status_error,
+                            getString(R.string.face_no_camera)));
+                } else {
+                    statusView.setText(R.string.face_status_ready);
+                }
                 break;
             case ENROLLING:
                 statusView.setText(R.string.face_status_enrolling);
@@ -330,9 +337,10 @@ public final class FaceRecognitionActivity extends AppCompatActivity
                 provider.bindToLifecycle(this, selector, preview, analysis);
                 cameraProvider = provider;
                 cameraBound = true;
+                cameraUnavailable = false;
                 renderControls();
             } catch (Exception exception) {
-                onError(visibleMessage(exception));
+                showNoCamera();
             }
         }, ContextCompat.getMainExecutor(this));
     }
@@ -380,6 +388,7 @@ public final class FaceRecognitionActivity extends AppCompatActivity
 
     private void showNoCamera() {
         cameraBound = false;
+        cameraUnavailable = true;
         onError(getString(R.string.face_no_camera));
     }
 
