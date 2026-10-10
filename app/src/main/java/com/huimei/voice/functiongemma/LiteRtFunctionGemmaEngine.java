@@ -3,6 +3,7 @@ package com.huimei.voice.functiongemma;
 import com.google.ai.edge.litertlm.Backend;
 import com.google.ai.edge.litertlm.Conversation;
 import com.google.ai.edge.litertlm.ConversationConfig;
+import com.google.ai.edge.litertlm.Contents;
 import com.google.ai.edge.litertlm.Engine;
 import com.google.ai.edge.litertlm.EngineConfig;
 import com.google.ai.edge.litertlm.Message;
@@ -16,6 +17,9 @@ import java.util.List;
 import java.util.Objects;
 
 public final class LiteRtFunctionGemmaEngine implements FunctionGemmaEngine {
+    private static final String FUNCTION_CALLING_SYSTEM_INSTRUCTION =
+            "You are a model that can do function calling with the following functions";
+
     private final File cacheDir;
     private Engine engine;
 
@@ -27,12 +31,13 @@ public final class LiteRtFunctionGemmaEngine implements FunctionGemmaEngine {
     public synchronized void initialize(File modelFile) {
         Objects.requireNonNull(modelFile, "modelFile");
         close();
+        ensureCacheDirectory(cacheDir);
         Engine candidate = new Engine(createEngineConfig(modelFile, cacheDir));
         try {
             candidate.initialize();
             engine = candidate;
         } catch (RuntimeException | Error failure) {
-            candidate.close();
+            closeAfterFailedInitialization(candidate, failure);
             throw failure;
         }
     }
@@ -78,7 +83,7 @@ public final class LiteRtFunctionGemmaEngine implements FunctionGemmaEngine {
 
     static ConversationConfig createConversationConfig() {
         return new ConversationConfig(
-                null,
+                Contents.Companion.of(FUNCTION_CALLING_SYSTEM_INSTRUCTION),
                 Collections.emptyList(),
                 FunctionGemmaToolSchema.toolProviders(),
                 new SamplerConfig(1, 1.0, 0.0, 0),
@@ -88,5 +93,25 @@ public final class LiteRtFunctionGemmaEngine implements FunctionGemmaEngine {
                 null,
                 false,
                 64);
+    }
+
+    static void closeAfterFailedInitialization(
+            AutoCloseable candidate,
+            Throwable initializeFailure) {
+        try {
+            candidate.close();
+        } catch (Throwable closeFailure) {
+            initializeFailure.addSuppressed(closeFailure);
+        }
+    }
+
+    static void ensureCacheDirectory(File cacheDir) {
+        if (cacheDir.isDirectory()) {
+            return;
+        }
+        if (cacheDir.exists() || !cacheDir.mkdirs()) {
+            throw new IllegalStateException(
+                    "Unable to create LiteRT-LM cache directory: " + cacheDir);
+        }
     }
 }

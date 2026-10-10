@@ -245,8 +245,15 @@ public final class FunctionGemmaCommandActivity extends AppCompatActivity
                     + transcript + " -> " + result.event().get().name()
                     + "（" + result.elapsedMillis() + " ms）");
         } else {
+            String calls = result.inference().isPresent()
+                    ? result.inference().get().toolCalls().toString()
+                    : "[]";
+            String raw = result.inference().isPresent()
+                    ? oneLine(result.inference().get().rawOutput())
+                    : "";
             appendLog(language.getDisplayName()
-                    + " [REJECTED] " + transcript + "（" + result.reason() + "）");
+                    + " [REJECTED] " + transcript + "（" + result.reason()
+                    + "，calls=" + calls + "，raw=" + raw + "）");
         }
     }
 
@@ -555,5 +562,10 @@ public final class FunctionGemmaCommandActivity extends AppCompatActivity
 
     private static String safeMessage(Throwable error) {
         return error.getMessage() == null ? error.getClass().getSimpleName() : error.getMessage();
+    }
+
+    private static String oneLine(String value) {
+        String normalized = value == null ? "" : value.replace('\n', ' ').replace('\r', ' ');
+        return normalized.length() <= 300 ? normalized : normalized.substring(0, 300) + "…";
     }
 }
