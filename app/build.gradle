@@ -39,6 +39,7 @@ dependencies {
     implementation 'androidx.camera:camera-lifecycle:1.4.2'
     implementation 'androidx.camera:camera-view:1.4.2'
     implementation 'com.airbnb.android:lottie:6.7.1'
+    implementation 'com.google.ai.edge.litertlm:litertlm-android:0.18.0'
     implementation 'org.opencv:opencv:4.13.0'
     implementation files('libs/sherpa-onnx-1.13.6.aar')
     implementation 'net.java.dev.jna:jna:5.18.1@aar'
