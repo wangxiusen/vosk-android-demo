@@ -4,6 +4,7 @@
 /build
 /app/build
 /models/build
+/downloads/functiongemma/
 /.worktrees
 .DS_Store
 *.md5
