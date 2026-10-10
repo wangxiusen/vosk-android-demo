@@ -30,7 +30,11 @@ public enum DemoDestination {
     FACE_RECOGNITION(
             R.string.demo_face_title,
             R.string.demo_face_summary,
-            FaceRecognitionActivity.class);
+            FaceRecognitionActivity.class),
+    FUNCTIONGEMMA_COMMAND(
+            R.string.demo_functiongemma_title,
+            R.string.demo_functiongemma_summary,
+            FunctionGemmaCommandActivity.class);
 
     private final int titleResourceId;
     private final int summaryResourceId;
