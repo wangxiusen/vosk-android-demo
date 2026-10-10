@@ -1,0 +1,47 @@
+FunctionGemma device memory record
+Date: 2026-10-10
+Device serial: 485A67904F39
+Device: rk3568_mtb720
+Android: API 30
+ABI: arm64-v8a, armeabi-v7a, armeabi
+
+Model
+  file: mobile_actions_q8_ekv1024.litertlm
+  size: 288,964,608 bytes (275.6 MiB)
+  sha256: 33e295cbd996b419bb1de8f3f85c5b6b01ee058a2c89bdb2173cf3e6ff4ce9d0
+  packaged in APK: no
+
+Final APK artifacts
+  debug: 374,720,746 bytes (about 357.4 MiB)
+  release unsigned: 353,921,715 bytes (about 337.6 MiB)
+  androidTest: 399,063 bytes
+  arm64-v8a liblitertlm_jni.so: 22,155,680 bytes
+  x86_64 liblitertlm_jni.so: 26,353,160 bytes
+
+MainActivity baseline
+  TOTAL PSS: 61,918 KB
+  TOTAL RSS: 187,448 KB
+  Native Heap PSS: 20,453 KB
+  Native Heap private dirty: 20,320 KB
+
+FunctionGemma model ready
+  TOTAL PSS: 637,173 KB
+  TOTAL RSS: 767,784 KB
+  Native Heap PSS: 293,232 KB
+  Native Heap private dirty: 293,128 KB
+
+Observed delta
+  PSS: +575,255 KB (about 561.8 MiB)
+  RSS: +580,336 KB (about 566.7 MiB)
+
+Release behavior
+  The instrumentation process exited after the scenario.
+  pidof and dumpsys meminfo then found no running com.huimei.voice process.
+  The OS therefore reclaimed the process memory.
+
+Interpretation
+  This is one snapshot of the full app process, not only the model allocation.
+  PSS is the more useful estimate of system memory contribution; RSS includes
+  shared pages in full. A 2 GB product can run this isolated demo, but this
+  measurement does not justify keeping FunctionGemma, TTS, face recognition,
+  and voiceprint models resident at the same time.

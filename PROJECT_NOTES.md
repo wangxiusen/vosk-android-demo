@@ -1,8 +1,8 @@
 # 潓美医疗离线语音 Demo：功能与工程知识记录
 
-> 更新日期：2026-09-21
+> 更新日期：2026-10-10
 >
-> 当前分支：`feat/face-recognition-demo`
+> 当前分支：`feat/functiongemma-command-demo`
 >
 > 应用包名：`com.huimei.voice`
 
@@ -24,6 +24,7 @@
 - sherpa-onnx 1.13.6 + 中文 AISHELL3 VITS + 英文 Piper LJSpeech VITS 提供任意文字离线 TTS。
 - sherpa-onnx CAM++ 与 Vosk `SpeakerModel` 提供两套自行实现的离线声纹对比 Demo。
 - CameraX 1.4.2 + OpenCV 4.13.0 + YuNet/SFace INT8 提供全离线人脸录入与 1:N 识别 Demo。
+- LiteRT-LM Android 0.18.0 + FunctionGemma 270M Mobile Actions Q8 提供离线自然语言到白名单事件的验证链路。
 - TTS 切换语言时释放旧模型，仅当前语言模型常驻；生成回调与 `AudioTrack` 播放通过有界 PCM 队列解耦。
 - 当前模型、Vosk、JNA及工程代码所使用的许可证信息见 `THIRD_PARTY_NOTICES.md`。
 
@@ -94,6 +95,7 @@ docs/      已确认的设计文档和实施计划
 - “任意文字口播动画 Demo”支持中英文文本、10 种中文女声音色、1 种英文女声、0.8/1.0/1.2 三档语速、短/标准/长三档标点停顿和标准/增强/强三档口播音量；中文音色按北方、南方各 5 种展示。停顿倍率分别为 0.5×、1.0×、1.5×，默认标准档。TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
 - “Sherpa 离线声纹 Demo”与“Vosk 离线声纹 Demo”共用三条录入样本、录音质量门、私有目录持久化和余弦匹配逻辑，可单独做 1:1 验证或 1:N 识别。页面显示模型加载、推理、PSS、分数、阈值和事件日志。
 - “离线人脸识别 Demo”前置摄像头优先、后置回退，自动采集 5 帧合格人脸并平均归一化特征；实时识别采用最新帧丢弃策略，同一候选连续 3 帧通过才确认。页面显示画面质量、模型加载、推理、PSS 和事件日志。
+- “FunctionGemma 语音指令 Demo”复用 Vosk 做中英文唤醒与自由听写。固定词条优先直接命中；未命中的文字才在 CPU 上调用 FunctionGemma，最终仅允许既有六个 `CommandEvent`。页面也提供文字调试、HTTPS 下载、本地文件导入、模型校验与删除。
 
 TTS PCM 已在写入 `AudioTrack` 前执行响度一致化：有效样本阈值 `-45 dBFS`，最大增益 `+18 dB`，峰值上限 `-1 dBFS`；标准/增强/强三档目标分别为 `-20/-18/-16 dBFS`，默认增强。嘴型仍使用未增益的原始 PCM，不会因音量放大而长期保持大口。方案、已测结果和冷启动耗时边界见 `docs/diagnostics/2026-08-26-tts-pcm-loudness-plan.md`。
 
@@ -123,6 +125,16 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 这样可以避免设备把自己的喇叭提示音再次识别为用户命令。
 
 `GAS_30_MINUTES`、`GAS_2_HOURS`、`POWER_ON`、`POWER_OFF` 尚未配置音频；这些事件仍会正常触发和记录日志，只是不播放提示音。
+
+### 2.6 FunctionGemma 指令路由
+
+- 模型文件不随 APK 打包，安装到 `files/functiongemma/models/mobile-actions-38942192/`。
+- 固定文件大小为 288,964,608 bytes，SHA-256 为 `33e295cbd996b419bb1de8f3f85c5b6b01ee058a2c89bdb2173cf3e6ff4ce9d0`；不匹配时拒绝安装。
+- 精确中英文词条先由 `CommandCatalog` 直接路由，不启动推理。
+- 自然文字模型结果必须恰好有一个工具调用，并通过函数名、参数集合、参数类型和时长白名单校验。
+- 模型推理期间停止 Vosk 麦克风读取，完成后恢复，避免同时争用 CPU 和内存带宽。
+- 页面产生的事件只写 UI 日志，不连接 RS232 或其他真实设备控制。
+- 当前 Mobile Actions 微调模型不是氧气机领域模型。真机只稳定验证了部分英文自然说法；中文自然说法与更多英文改写需用领域数据微调后重新评测。
 
 ## 3. 核心代码位置
 
@@ -161,6 +173,11 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 | `app/src/main/java/com/huimei/voice/face/OpenCvFaceEngine.java` | YuNet 检测、质量门、SFace 对齐和 128 维特征 |
 | `app/src/main/java/com/huimei/voice/face/FaceRecognitionController.java` | 录入、识别、限流、稳定确认和过期回调防护 |
 | `app/src/main/java/com/huimei/voice/face/FaceRepository.java` | 私有目录的照片、特征和人员元数据持久化 |
+| `app/src/main/java/com/huimei/voice/FunctionGemmaCommandActivity.java` | 模型管理、Vosk 语音入口、文字调试与指令日志页面 |
+| `app/src/main/java/com/huimei/voice/functiongemma/HybridVoiceCommandSession.java` | 精确词条优先、模型兜底与事件路由编排 |
+| `app/src/main/java/com/huimei/voice/functiongemma/LiteRtFunctionGemmaEngine.java` | LiteRT-LM CPU 引擎、系统指令、工具声明与推理适配 |
+| `app/src/main/java/com/huimei/voice/functiongemma/FunctionGemmaCommandValidator.java` | 单工具调用和严格白名单校验 |
+| `app/src/main/java/com/huimei/voice/functiongemma/FunctionGemmaModelStore.java` | 模型大小/SHA-256 校验、暂存与原子安装 |
 
 ## 4. 模型存放、切换和加载
 
@@ -288,12 +305,13 @@ APK输出：
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
-截至本文记录时，最近一次完整验证结果为：
+截至本文记录时，最近一次 FunctionGemma 分支验证结果为：
 
-- `clean :app:testDebugUnitTest :app:assembleDebug` 构建成功。
-- 116 个 JVM 单元测试通过，0 失败，0 跳过。
-- 3 个声纹真机界面/生命周期自动测试通过。
-- Debug APK 为 348,119,217 bytes（约 332 MiB）；其中同时包含中英文 Vosk、中英文 TTS、Lottie、MP3、两套声纹模型、OpenCV 三个 ABI 原生库和两个人脸模型。
+- `:app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest` 构建成功。
+- 155 个 JVM 单元测试通过，0 失败，0 跳过。
+- RK3568 真机上的 FunctionGemma 页面导航/重建 2 个用例、真实模型冒烟矩阵 1 个用例和 35 条输入宽覆盖评测 1 个用例通过。宽覆盖结果为中文自然改写 0/10、英文 3/10，无关/非法/冲突输入拒绝 15/15，平均推理约 3.93 秒。
+- Debug APK 为 374,720,746 bytes（约 357.4 MiB）；Release unsigned APK 为 353,921,715 bytes（约 337.6 MiB）。两者均不包含 `.litertlm` 模型，只包含 arm64-v8a 与 x86_64 LiteRT-LM JNI 库。
+- LiteRT-LM 0.18.0 依赖使用 Kotlin 2.4 元数据，当前构建链的 R8 元数据解析上限为 2.2，Release 构建会输出警告，但本次仍成功生成 APK；升级 Android Gradle Plugin/R8 后需重新验证。
 - Huawei HMA-AL00（Android 10）上 Sherpa 与 Vosk 声纹模型均进入就绪，冷加载分别为 568 ms 和 563 ms。
 - 中文模型目录约65 MB。
 - 英文模型目录约68 MB。
@@ -301,7 +319,7 @@ app/build/outputs/apk/debug/app-debug.apk
 
 声纹性能数据、已验证范围和未完成的真人阈值测试见 `docs/voiceprint-comparison.md`。
 
-人脸 Demo 的纯逻辑、干净构建和 APK 打包已验证；本次验收时 ADB 无在线设备，所以目标工业 Pad 的摄像头预览、真人录入/匹配、推理耗时与 PSS 均明确标记为未验证，详见 `docs/face-recognition-verification.md`。
+人脸 Demo 的纯逻辑、干净构建和 APK 打包已验证；此前人脸验收时 ADB 无在线设备，所以目标工业 Pad 的摄像头预览、真人录入/匹配、推理耗时与 PSS 均仍标记为未验证，详见 `docs/face-recognition-verification.md`。本次在线设备只验收了 FunctionGemma，不应把结果外推到人脸功能。
 
 Vosk 声纹提取不能只读取 `getFinalResult()`：一句话先触发端点、录音尾部又包含静音时，有效的 `spk`/`spk_frames` 会位于此前的 `getResult()`。当前适配器保存全部端点结果并选择帧数最多的有效声纹向量，最低帧数与 Vosk 原生实现保持为 50。
 
@@ -321,6 +339,8 @@ PSS与RSS的简单理解：
 - RSS是进程当前驻留在物理内存中的页面总量，其中共享页可能在多个进程中重复计算。
 - PSS会把共享页按共享进程数分摊，更适合观察某个Android应用对系统内存的实际贡献。
 - Java Heap只覆盖Java对象，不包含Vosk/JNA原生内存、映射文件和共享库，因此不能只看Java Heap判断总占用。
+
+FunctionGemma 在 `rk3568_mtb720` 实机上的单次测量为：主页面基线 PSS 61,918 KB、RSS 187,448 KB；模型就绪后 PSS 637,173 KB、RSS 767,784 KB，增量约 562 MiB/567 MiB。测试退出后进程结束，内存由系统回收。对 2 GB 工业机，这说明功能可以独立运行，但不适合让 FunctionGemma、TTS、人脸、Vosk 声纹等大模型同时常驻；量产前必须按真实固件和后台进程重新做内存压力与长稳测试。完整记录见 `docs/diagnostics/2026-10-10-functiongemma-device-memory.log`。
 
 最终量产前应在目标RK3568整机上测量冷启动、中文/英文切换、持续监听、连续提示音播放、24至72小时运行、温升、PSS和CPU占用。
 
@@ -415,6 +435,7 @@ Model downloadedModel = new Model(localModelDirectory);
 - Android后台服务、开机自启和系统Kiosk模式。
 - 正式医疗器械软件生命周期、风险管理和注册检验资料。
 - 工业噪声环境下的量产级识别率统计。
+- 氧气机领域 FunctionGemma 中英文微调数据、训练、转换与量产准确率评测。
 
 ## 9. 氧气机集成与安全边界
 

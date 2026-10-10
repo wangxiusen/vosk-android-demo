@@ -1,6 +1,6 @@
 # 潓美医疗 Vosk 离线语音 Demo
 
-这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动、任意文字离线口播、Sherpa/Vosk 两套离线声纹，以及 OpenCV 离线人脸识别 Demo。声纹和人脸业务流程均为本项目自行实现。
+这是一个基于官方 [vosk-android-demo](https://github.com/alphacep/vosk-android-demo) 改造的 Java/XML Android 示例。启动页以列表提供离线语音识别、医疗助手 Lottie V5、语音与动画联动、任意文字离线口播、Sherpa/Vosk 两套离线声纹、OpenCV 离线人脸识别，以及 FunctionGemma 离线语音指令 Demo。声纹、人脸和指令路由业务流程均为本项目自行实现。
 
 ## 功能
 
@@ -20,6 +20,8 @@
 - 声纹 WAV、人员资料和分引擎特征仅保存到应用私有目录，支持删除单人或清空全部资料。
 - 新增 CameraX + OpenCV YuNet/SFace 离线人脸 Demo：每人自动采集 5 帧合格人脸，实时 1:N 识别需连续 3 帧同一候选才确认。
 - 人脸照片、元数据和 128 维特征仅保存在应用私有目录，不上传网络；支持删除单人或清空全部资料。
+- 新增 FunctionGemma 指令页：Vosk 完成唤醒与自由听写，固定中英文词条直接映射事件，其他文字才交给 LiteRT-LM；模型输出必须通过单调用、函数名、参数和值域白名单校验。
+- FunctionGemma 模型不打入 APK。页面支持 HTTPS 直链下载或本地文件导入，并在安装前校验固定大小和 SHA-256；模型仅保存到应用私有目录。
 
 ## 命令
 
@@ -60,6 +62,8 @@ Debug APK 输出到：
 app/build/outputs/apk/debug/app-debug.apk
 ```
 
+FunctionGemma 页面要求 Android 7.0+ 且设备 ABI 为 `arm64-v8a` 或 `x86_64`。当前模型文件是 `mobile_actions_q8_ekv1024.litertlm`（288,964,608 bytes）；下载或导入后由页面完成校验，APK 本身不包含该文件。
+
 启动后先选择 Demo。进入语音识别 Demo 时需要授予麦克风权限，默认加载中文模型并自动开始监听。
 
 ## 代码结构
@@ -84,6 +88,10 @@ app/build/outputs/apk/debug/app-debug.apk
 - `face/OpenCvFaceEngine`：YuNet 检测、质量门、SFace 对齐与 128 维特征提取。
 - `face/FaceRecognitionController`：五帧录入、有界帧处理、三帧稳定确认与生命周期管理。
 - `face/FaceRepository`：应用私有目录的人脸资料、照片和特征持久化。
+- `FunctionGemmaCommandActivity`：模型下载/导入、Vosk 唤醒听写、文字调试、指令结果与诊断日志 UI。
+- `functiongemma/HybridVoiceCommandSession`：固定词条优先、FunctionGemma 兜底和白名单事件路由。
+- `functiongemma/LiteRtFunctionGemmaEngine`：LiteRT-LM CPU 引擎、工具声明与单轮推理。
+- `functiongemma/FunctionGemmaModelStore`：私有目录暂存、大小/SHA-256 校验和原子安装。
 
 ## 声纹 Demo
 
@@ -101,6 +109,12 @@ app/build/outputs/apk/debug/app-debug.apk
 
 当前余弦阈值 `0.363` 只是 OpenCV 示例起点，没有经过目标人群和工业环境标定；当前也没有活体检测。不能把该 Demo 单独用于制氧机启停、治疗参数或其他安全关键操作。方案与待标定项见 [人脸识别调研](docs/face-recognition-research.md)，当前验证证据见 [人脸识别验证记录](docs/face-recognition-verification.md)。
 
+## FunctionGemma 指令 Demo
+
+固定命令会在本地目录中直接命中，不消耗模型推理时间。未命中的文字才进入 FunctionGemma；无工具调用、多工具调用、未知函数、非法时长或冲突参数全部拒绝，只写日志，不控制真实硬件。
+
+当前 Mobile Actions 微调模型主要用于验证 Android 端离线工具调用链路，并不等于已经适配氧气机领域。RK3568 宽覆盖评测中，中文自然改写为 0/10、英文为 3/10，但无关/非法/冲突输入拒绝 15/15；自然中文和未覆盖的英文改写仍需要业务数据微调。逐条输入、启动问题修复、内存和 APK 证据见 [FunctionGemma 真机评测](docs/diagnostics/2026-10-10-functiongemma-command-evaluation.md)。
+
 ## 中文模型词表说明
 
 `vosk-model-small-cn-0.22` 的词表包含 `惠美`、`医疗`、`产`、`气`，但不包含品牌生僻字词元 `潓美`，也不包含组合词元 `产气`。因此底层限定语法使用模型已有词元，例如 `惠美 医疗` 和 `半小时 产 气`；业务层会去除中文词元间空格，将唤醒事件统一显示为 `潓美医疗`。这不会改变用户需要说出的口令。
@@ -110,6 +124,8 @@ app/build/outputs/apk/debug/app-debug.apk
 JVM 测试和 APK 构建只能验证程序逻辑与打包。中文品牌发音、英文口音、麦克风距离和工业噪声必须在目标 Android 真机上测试。
 
 本 Demo 的 `POWER_ON`、`POWER_OFF` 等仅为日志事件，不控制真实医疗设备。量产接入必须通过 `VoiceRecognitionListener` 对接设备层，并保留实体安全联锁、危险动作确认和故障保护。
+
+FunctionGemma 在 RK3568 真机加载后的应用总 PSS 约 622 MiB、RSS 约 750 MiB。2 GB 设备可用于独立 Demo 验证，但量产不能据此认定余量充足；应避免与 TTS、人脸、双声纹等大模型同时常驻，并在目标固件上做长稳、低内存回收和温升测试。
 
 Vosk 0.3.75 的 Android 原生库还需要在目标设备上验证 16 KB 内存页兼容性；如需上架面向新设备的应用商店版本，应在发布前重新核对或重编 Vosk 原生库。
 
