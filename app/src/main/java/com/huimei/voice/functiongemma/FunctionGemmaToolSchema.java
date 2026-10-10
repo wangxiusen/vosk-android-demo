@@ -19,8 +19,8 @@ public final class FunctionGemmaToolSchema {
                     + "\"additionalProperties\":false}}",
             "{\"name\":\"set_gas_duration\",\"description\":\"Set gas production duration in minutes. "
                     + "\u8bbe\u7f6e\u5236\u6c27\u65f6\u957f（\u5206\u949f）。\",\"parameters\":{\"type\":\"object\","
-                    + "\"properties\":{\"minutes\":{\"type\":\"integer\",\"enum\":[30,60,120,480]}},"
-                    + "\"required\":[\"minutes\"],\"additionalProperties\":false}}"));
+                    + "\"properties\":{\"duration_minutes\":{\"type\":\"integer\",\"enum\":[30,60,120,480]}},"
+                    + "\"required\":[\"duration_minutes\"],\"additionalProperties\":false}}"));
 
     private FunctionGemmaToolSchema() {
     }

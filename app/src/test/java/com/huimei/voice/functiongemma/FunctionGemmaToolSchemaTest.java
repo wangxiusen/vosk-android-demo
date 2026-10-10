@@ -41,10 +41,12 @@ public final class FunctionGemmaToolSchemaTest {
 
             assertEquals(1, parameters.getJSONObject("properties").length());
             JSONObject minutes = parameters.getJSONObject("properties")
-                    .getJSONObject("minutes");
+                    .getJSONObject("duration_minutes");
             assertEquals("integer", minutes.getString("type"));
             assertEquals("[30,60,120,480]", minutes.getJSONArray("enum").toString());
-            assertEquals("minutes", parameters.getJSONArray("required").getString(0));
+            assertEquals(
+                    "duration_minutes",
+                    parameters.getJSONArray("required").getString(0));
             assertFalse(parameters.optBoolean("additionalProperties", true));
         }
     }
