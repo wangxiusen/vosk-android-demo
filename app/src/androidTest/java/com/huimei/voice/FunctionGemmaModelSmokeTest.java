@@ -26,7 +26,7 @@ public final class FunctionGemmaModelSmokeTest {
     private static final long INFERENCE_TIMEOUT_MILLIS = 30_000L;
 
     @Test
-    public void routesKnownCommandsAndRejectsUnvalidatedModelOutputs() throws Exception {
+    public void routesExactAndCommonNaturalCommandsAndRejectsUnsafeInputs() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         File model = new File(
                 new File(
@@ -50,15 +50,20 @@ public final class FunctionGemmaModelSmokeTest {
             route(scenario, true, "Please turn off the machine because I am finished");
             route(scenario, true, "Please turn on the machine for me");
             route(scenario, false, "请帮我打开设备");
+            route(scenario, false, "让设备运行半小时");
+            route(scenario, false, "请不要开机");
             route(scenario, false, "让设备产气三个小时");
             String log = route(scenario, false, "今天天气怎么样");
 
             assertContains(log, "中文 [EXACT] 开机 -> POWER_ON");
             assertContains(log, "English [EXACT] two hours gas production -> GAS_2_HOURS");
-            assertContains(log, "English [MODEL_ACCEPTED] "
+            assertContains(log, "English [LOCAL_NATURAL] "
                     + "Please turn off the machine because I am finished -> POWER_OFF");
-            assertContains(log, "English [REJECTED] Please turn on the machine for me");
-            assertContains(log, "中文 [REJECTED] 请帮我打开设备");
+            assertContains(log, "English [LOCAL_NATURAL] "
+                    + "Please turn on the machine for me -> POWER_ON");
+            assertContains(log, "中文 [LOCAL_NATURAL] 请帮我打开设备 -> POWER_ON");
+            assertContains(log, "中文 [LOCAL_NATURAL] 让设备运行半小时 -> GAS_30_MINUTES");
+            assertContains(log, "中文 [REJECTED] 请不要开机");
             assertContains(log, "中文 [REJECTED] 让设备产气三个小时");
             assertContains(log, "中文 [REJECTED] 今天天气怎么样");
         }

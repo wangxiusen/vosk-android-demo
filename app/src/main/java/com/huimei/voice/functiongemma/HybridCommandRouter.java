@@ -14,6 +14,8 @@ public final class HybridCommandRouter {
 
     private final FunctionGemmaEngine engine;
     private final TimeSource timeSource;
+    private final CommonNaturalCommandParser naturalParser =
+            new CommonNaturalCommandParser();
     private final FunctionGemmaCommandValidator validator =
             new FunctionGemmaCommandValidator();
 
@@ -35,6 +37,14 @@ public final class HybridCommandRouter {
         Optional<CommandMatch> exact = CommandCatalog.forLanguage(language).find(text);
         if (exact.isPresent() && exact.get().getEvent() != CommandEvent.WAKE_UP) {
             return HybridCommandResult.exact(exact.get().getEvent());
+        }
+
+        CommonNaturalCommandParser.Result natural = naturalParser.parse(language, text);
+        if (natural.status() == CommonNaturalCommandParser.Status.MATCHED) {
+            return HybridCommandResult.localNatural(natural.event().get());
+        }
+        if (natural.status() == CommonNaturalCommandParser.Status.REJECTED) {
+            return HybridCommandResult.rejected(natural.reason(), null, 0L);
         }
 
         long startedAt = timeSource.nowMillis();

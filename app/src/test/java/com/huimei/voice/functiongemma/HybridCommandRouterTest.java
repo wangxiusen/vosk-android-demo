@@ -34,12 +34,34 @@ public final class HybridCommandRouterTest {
     }
 
     @Test
-    public void naturalLanguageUsesTheModelOnceAndReportsElapsedTime() {
+    public void commonNaturalCommandsBypassTheModelAndUnsafeCommandsAreRejected() {
+        MutableTimeSource clock = new MutableTimeSource();
+        CountingEngine engine = new CountingEngine(clock, accepted("power_off"));
+        HybridCommandRouter router = new HybridCommandRouter(engine, clock);
+
+        HybridCommandResult chinese = router.route(
+                VoiceLanguage.CHINESE, "请帮我打开设备");
+        HybridCommandResult english = router.route(
+                VoiceLanguage.ENGLISH, "Run the device for two hours");
+        HybridCommandResult unsafe = router.route(
+                VoiceLanguage.CHINESE, "请不要开机");
+
+        assertEquals(HybridCommandResult.Route.LOCAL_NATURAL, chinese.route());
+        assertEquals(CommandEvent.POWER_ON, chinese.event().get());
+        assertEquals(HybridCommandResult.Route.LOCAL_NATURAL, english.route());
+        assertEquals(CommandEvent.GAS_2_HOURS, english.event().get());
+        assertEquals(HybridCommandResult.Route.REJECTED, unsafe.route());
+        assertEquals("negated_command", unsafe.reason());
+        assertEquals(0, engine.inferCount);
+    }
+
+    @Test
+    public void unmatchedNaturalLanguageUsesTheModelOnceAndReportsElapsedTime() {
         MutableTimeSource clock = new MutableTimeSource();
         CountingEngine engine = new CountingEngine(clock, accepted("power_on"));
         HybridCommandRouter router = new HybridCommandRouter(engine, clock);
 
-        HybridCommandResult result = router.route(VoiceLanguage.CHINESE, "请帮我启动一下机器");
+        HybridCommandResult result = router.route(VoiceLanguage.CHINESE, "请按照我的安排处理");
 
         assertEquals(HybridCommandResult.Route.MODEL_ACCEPTED, result.route());
         assertEquals(CommandEvent.POWER_ON, result.event().get());

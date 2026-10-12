@@ -105,3 +105,11 @@
 - [Google AI Edge Gallery Mobile Actions 示例](https://github.com/google-ai-edge/gallery/blob/main/Android/src/app/src/main/java/com/google/ai/edge/gallery/customtasks/mobileactions/MobileActionsTask.kt)
 
 内存和 APK 证据见 [设备内存记录](2026-10-10-functiongemma-device-memory.log)。
+
+## 5. 2026-10-12 常见中英文解析补充
+
+为避免让英文 Mobile Actions 模型直接承担中文量产理解，在精确词条与模型兜底之间新增轻量本地语义层。它按语言提取动作、设备和时长，覆盖开机、关机及 30 分钟/1/2/8 小时产气；否定、动作冲突、时长冲突和非白名单时长在模型前直接拒绝。未识别的自然文字仍保留 FunctionGemma 兜底，因此没有把固定整句列表扩展成另一套大词表。
+
+这项改动提升的是确定性本地覆盖，不代表 FunctionGemma 模型本身的中文能力发生变化。上文 2026-10-10 的 3/20 结果仍是模型兜底的历史基线。
+
+本次本地验收为 159 个 JVM 测试通过，Debug、Release unsigned 和 Android 测试 APK 均构建成功。更新后的真机冒烟与 20 条常见改写 instrumentation 测试已经加入代码，但记录时 ADB 只有离线模拟器、没有在线真机，因此不把它们标记为真机通过。

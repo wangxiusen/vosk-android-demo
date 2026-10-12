@@ -7,6 +7,7 @@ import java.util.Optional;
 public final class HybridCommandResult {
     public enum Route {
         EXACT,
+        LOCAL_NATURAL,
         MODEL_ACCEPTED,
         REJECTED
     }
@@ -32,6 +33,11 @@ public final class HybridCommandResult {
 
     public static HybridCommandResult exact(CommandEvent event) {
         return new HybridCommandResult(Route.EXACT, event, null, 0L, "exact");
+    }
+
+    public static HybridCommandResult localNatural(CommandEvent event) {
+        return new HybridCommandResult(
+                Route.LOCAL_NATURAL, event, null, 0L, "local_natural");
     }
 
     public static HybridCommandResult modelAccepted(

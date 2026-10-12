@@ -20,7 +20,7 @@
 - 声纹 WAV、人员资料和分引擎特征仅保存到应用私有目录，支持删除单人或清空全部资料。
 - 新增 CameraX + OpenCV YuNet/SFace 离线人脸 Demo：每人自动采集 5 帧合格人脸，实时 1:N 识别需连续 3 帧同一候选才确认。
 - 人脸照片、元数据和 128 维特征仅保存在应用私有目录，不上传网络；支持删除单人或清空全部资料。
-- 新增 FunctionGemma 指令页：Vosk 完成唤醒与自由听写，固定中英文词条直接映射事件，其他文字才交给 LiteRT-LM；模型输出必须通过单调用、函数名、参数和值域白名单校验。
+- 新增 FunctionGemma 指令页：Vosk 完成唤醒与自由听写，固定词条和常见中英文自然说法先在本地映射事件，其他文字才交给 LiteRT-LM；模型输出必须通过单调用、函数名、参数和值域白名单校验。
 - FunctionGemma 模型不打入 APK。页面支持 HTTPS 直链下载或本地文件导入，并在安装前校验固定大小和 SHA-256；模型仅保存到应用私有目录。
 
 ## 命令
@@ -89,7 +89,7 @@ FunctionGemma 页面要求 Android 7.0+ 且设备 ABI 为 `arm64-v8a` 或 `x86_6
 - `face/FaceRecognitionController`：五帧录入、有界帧处理、三帧稳定确认与生命周期管理。
 - `face/FaceRepository`：应用私有目录的人脸资料、照片和特征持久化。
 - `FunctionGemmaCommandActivity`：模型下载/导入、Vosk 唤醒听写、文字调试、指令结果与诊断日志 UI。
-- `functiongemma/HybridVoiceCommandSession`：固定词条优先、FunctionGemma 兜底和白名单事件路由。
+- `functiongemma/HybridVoiceCommandSession`：固定词条、本地中英文自然语义、FunctionGemma 兜底和白名单事件路由。
 - `functiongemma/LiteRtFunctionGemmaEngine`：LiteRT-LM CPU 引擎、工具声明与单轮推理。
 - `functiongemma/FunctionGemmaModelStore`：私有目录暂存、大小/SHA-256 校验和原子安装。
 
@@ -111,9 +111,9 @@ FunctionGemma 页面要求 Android 7.0+ 且设备 ABI 为 `arm64-v8a` 或 `x86_6
 
 ## FunctionGemma 指令 Demo
 
-固定命令会在本地目录中直接命中，不消耗模型推理时间。未命中的文字才进入 FunctionGemma；无工具调用、多工具调用、未知函数、非法时长或冲突参数全部拒绝，只写日志，不控制真实硬件。
+固定命令会先在本地目录中直接命中。常见中英文自然说法随后由轻量本地解析器提取“动作 + 设备 + 时长”，覆盖开机、关机和 30 分钟/1/2/8 小时产气，同样不消耗模型推理时间。否定、冲突或不支持的时长直接拒绝；只有仍未匹配的文字才进入 FunctionGemma。所有结果只写日志，不控制真实硬件。
 
-当前 Mobile Actions 微调模型主要用于验证 Android 端离线工具调用链路，并不等于已经适配氧气机领域。RK3568 宽覆盖评测中，中文自然改写为 0/10、英文为 3/10，但无关/非法/冲突输入拒绝 15/15；自然中文和未覆盖的英文改写仍需要业务数据微调。逐条输入、启动问题修复、内存和 APK 证据见 [FunctionGemma 真机评测](docs/diagnostics/2026-10-10-functiongemma-command-evaluation.md)。
+当前 Mobile Actions 微调模型主要用于验证 Android 端离线工具调用链路，并不等于已经适配氧气机领域。2026-10-10 的模型兜底基线为中文自然改写 0/10、英文 3/10；常见中英文表达现在由本地解析器稳定覆盖，但超出规则的自然语言仍需领域微调或扩充经过测试的解析规则。逐条输入、启动问题修复、内存和 APK 证据见 [FunctionGemma 真机评测](docs/diagnostics/2026-10-10-functiongemma-command-evaluation.md)。
 
 ## 中文模型词表说明
 

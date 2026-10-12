@@ -98,6 +98,7 @@ public final class FunctionGemmaEvaluationTest {
                 log(evaluation, result);
             }
             Log.i(TAG, "PARAPHRASE_SCORE " + correct + "/" + paraphrases.length);
+            assertEquals("Common paraphrase coverage", paraphrases.length, correct);
 
             for (EvaluationCase evaluation : rejected) {
                 HybridCommandResult result = router.route(evaluation.language, evaluation.input);

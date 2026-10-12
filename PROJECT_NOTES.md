@@ -95,7 +95,7 @@ docs/      已确认的设计文档和实施计划
 - “任意文字口播动画 Demo”支持中英文文本、10 种中文女声音色、1 种英文女声、0.8/1.0/1.2 三档语速、短/标准/长三档标点停顿和标准/增强/强三档口播音量；中文音色按北方、南方各 5 种展示。停顿倍率分别为 0.5×、1.0×、1.5×，默认标准档。TTS 流式 PCM 每 20ms 映射为四个嘴型，眼睛动画保持独立。
 - “Sherpa 离线声纹 Demo”与“Vosk 离线声纹 Demo”共用三条录入样本、录音质量门、私有目录持久化和余弦匹配逻辑，可单独做 1:1 验证或 1:N 识别。页面显示模型加载、推理、PSS、分数、阈值和事件日志。
 - “离线人脸识别 Demo”前置摄像头优先、后置回退，自动采集 5 帧合格人脸并平均归一化特征；实时识别采用最新帧丢弃策略，同一候选连续 3 帧通过才确认。页面显示画面质量、模型加载、推理、PSS 和事件日志。
-- “FunctionGemma 语音指令 Demo”复用 Vosk 做中英文唤醒与自由听写。固定词条优先直接命中；未命中的文字才在 CPU 上调用 FunctionGemma，最终仅允许既有六个 `CommandEvent`。页面也提供文字调试、HTTPS 下载、本地文件导入、模型校验与删除。
+- “FunctionGemma 语音指令 Demo”复用 Vosk 做中英文唤醒与自由听写。固定词条优先直接命中，常见自然说法再由本地解析器提取动作、设备和时长；仍未匹配的文字才在 CPU 上调用 FunctionGemma，最终仅允许既有六个 `CommandEvent`。页面也提供文字调试、HTTPS 下载、本地文件导入、模型校验与删除。
 
 TTS PCM 已在写入 `AudioTrack` 前执行响度一致化：有效样本阈值 `-45 dBFS`，最大增益 `+18 dB`，峰值上限 `-1 dBFS`；标准/增强/强三档目标分别为 `-20/-18/-16 dBFS`，默认增强。嘴型仍使用未增益的原始 PCM，不会因音量放大而长期保持大口。方案、已测结果和冷启动耗时边界见 `docs/diagnostics/2026-08-26-tts-pcm-loudness-plan.md`。
 
@@ -131,10 +131,11 @@ V5 动画文件为 `app/src/main/assets/medical-assistant-talking-v5.json`，包
 - 模型文件不随 APK 打包，安装到 `files/functiongemma/models/mobile-actions-38942192/`。
 - 固定文件大小为 288,964,608 bytes，SHA-256 为 `33e295cbd996b419bb1de8f3f85c5b6b01ee058a2c89bdb2173cf3e6ff4ce9d0`；不匹配时拒绝安装。
 - 精确中英文词条先由 `CommandCatalog` 直接路由，不启动推理。
+- 常见中英文自然说法再由 `CommonNaturalCommandParser` 本地路由为 `LOCAL_NATURAL`；否定、冲突和非白名单时长直接拒绝，不调用模型。
 - 自然文字模型结果必须恰好有一个工具调用，并通过函数名、参数集合、参数类型和时长白名单校验。
 - 模型推理期间停止 Vosk 麦克风读取，完成后恢复，避免同时争用 CPU 和内存带宽。
 - 页面产生的事件只写 UI 日志，不连接 RS232 或其他真实设备控制。
-- 当前 Mobile Actions 微调模型不是氧气机领域模型。真机只稳定验证了部分英文自然说法；中文自然说法与更多英文改写需用领域数据微调后重新评测。
+- 当前 Mobile Actions 微调模型不是氧气机领域模型。本地解析器只覆盖经过测试的常见中英文结构；超出这些结构的表达仍需扩充规则或用领域数据微调后重新评测。
 
 ## 3. 核心代码位置
 
@@ -308,9 +309,9 @@ app/build/outputs/apk/debug/app-debug.apk
 截至本文记录时，最近一次 FunctionGemma 分支验证结果为：
 
 - `:app:testDebugUnitTest :app:assembleDebug :app:assembleRelease :app:assembleDebugAndroidTest` 构建成功。
-- 155 个 JVM 单元测试通过，0 失败，0 跳过。
-- RK3568 真机上的 FunctionGemma 页面导航/重建 2 个用例、真实模型冒烟矩阵 1 个用例和 35 条输入宽覆盖评测 1 个用例通过。宽覆盖结果为中文自然改写 0/10、英文 3/10，无关/非法/冲突输入拒绝 15/15，平均推理约 3.93 秒。
-- Debug APK 为 374,720,746 bytes（约 357.4 MiB）；Release unsigned APK 为 353,921,715 bytes（约 337.6 MiB）。两者均不包含 `.litertlm` 模型，只包含 arm64-v8a 与 x86_64 LiteRT-LM JNI 库。
+- 159 个 JVM 单元测试通过，0 失败，0 跳过；其中包含常见中英文自然指令、否定、冲突、非法时长和模型回退边界。
+- 2026-10-10 的 RK3568 真机历史基线为：FunctionGemma 页面导航/重建 2 个用例、真实模型冒烟矩阵 1 个用例和 35 条输入宽覆盖评测 1 个用例通过；模型兜底的中文自然改写为 0/10、英文 3/10，无关/非法/冲突输入拒绝 15/15，平均推理约 3.93 秒。2026-10-12 新增的本地自然语义层仍需在在线真机上补跑更新后的 instrumentation 用例。
+- Debug APK 为 374,720,746 bytes（约 357.4 MiB）；Release unsigned APK 为 353,924,255 bytes（约 337.6 MiB）。两者均不包含 `.litertlm` 模型，只包含 arm64-v8a 与 x86_64 LiteRT-LM JNI 库。
 - LiteRT-LM 0.18.0 依赖使用 Kotlin 2.4 元数据，当前构建链的 R8 元数据解析上限为 2.2，Release 构建会输出警告，但本次仍成功生成 APK；升级 Android Gradle Plugin/R8 后需重新验证。
 - Huawei HMA-AL00（Android 10）上 Sherpa 与 Vosk 声纹模型均进入就绪，冷加载分别为 568 ms 和 563 ms。
 - 中文模型目录约65 MB。
