@@ -1,0 +1,48 @@
+/* Lightning on the industrial Pad over-expands grid tracks inside the review
+   panel. Use one-column blocks and two rows of tabs to avoid that layout path. */
+.console-panel {
+  width: 420px;
+  max-width: 100vw;
+  overflow: hidden;
+}
+
+.console-body {
+  min-width: 0;
+  width: auto;
+}
+
+.console-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  min-width: 0;
+}
+
+.console-tabs button {
+  box-sizing: border-box;
+  flex: 0 0 50%;
+  width: 50%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.console-body .action-grid {
+  display: block;
+  min-width: 0;
+  width: 100%;
+}
+
+.console-body .action-grid button {
+  box-sizing: border-box;
+  display: block;
+  min-width: 0;
+  width: 100%;
+  margin-bottom: 8px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.console-body .full-button {
+  box-sizing: border-box;
+}
